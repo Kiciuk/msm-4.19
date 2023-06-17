@@ -17,6 +17,7 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/regulator/qcom,rpm-smd-regulator.h>
 #include <dt-bindings/clock/qcom,gcc-msm8953.h>
+#include <dt-bindings/clock/qcom,rpmcc.h>
 #include <dt-bindings/msm/msm-bus-ids.h>
 
 / {
@@ -868,6 +869,11 @@
 		#clock-cells = <1>;
 	};
 
+	rpmcc: qcom,rpmcc {
+		compatible = "qcom,rpmcc-msm8953";
+		#clock-cells = <1>;
+	};
+	
 	clock_gcc: qcom,gcc@1800000 {
 		compatible = "qcom,gcc-8953";
 		reg = <0x1800000 0x80000>,
@@ -1722,7 +1728,7 @@
 		qcom,dwc-usb3-msm-tx-fifo-size = <21288>;
 
 		clocks = <&clock_gcc clk_gcc_usb30_master_clk>,
-			<&clock_gcc clk_gcc_pcnoc_usb3_axi_clk>,
+			<&clock_gcc GCC_PCNOC_USB3_AXI_CLK>,
 			<&clock_gcc clk_gcc_usb30_mock_utmi_clk>,
 			<&clock_gcc clk_gcc_usb30_sleep_clk>,
 			<&clock_gcc clk_xo_dwc3_clk>,
@@ -1849,7 +1855,7 @@
 		clocks = <&clock_gcc clk_bb_clk1>,
 			 <&clock_gcc clk_gcc_qusb_ref_clk>,
 			 <&clock_gcc clk_gcc_usb_phy_cfg_ahb_clk>,
-			 <&clock_gcc clk_gcc_pcnoc_usb3_axi_clk>,
+			 <&clock_gcc GCC_PCNOC_USB3_AXI_CLK>,
 			 <&clock_gcc clk_gcc_usb30_master_clk>;
 
 		clock-names = "ref_clk_src", "ref_clk", "cfg_ahb_clk",
@@ -2119,8 +2125,8 @@
 		qcom,mas-crypto = <&mas_crypto>;
 
 		clocks = <&clock_gcc clk_gcc_venus0_vcodec0_clk>,
-			<&clock_gcc clk_gcc_venus0_ahb_clk>,
-			<&clock_gcc clk_gcc_venus0_axi_clk>,
+			<&clock_gcc clk_GCC_VENUS0_AHB_CLK>,
+			<&clock_gcc clk_GCC_VENUS0_AXI_CLK>,
 			<&clock_gcc clk_gcc_crypto_clk>,
 			<&clock_gcc clk_gcc_crypto_ahb_clk>,
 			<&clock_gcc clk_gcc_crypto_axi_clk>,
@@ -2247,7 +2253,7 @@
 
 &gdsc_venus {
 	clock-names = "bus_clk", "core_clk";
-	clocks = <&clock_gcc clk_gcc_venus0_axi_clk>,
+	clocks = <&clock_gcc clk_GCC_VENUS0_AXI_CLK>,
 		<&clock_gcc clk_gcc_venus0_vcodec0_clk>;
 	status = "okay";
 };
@@ -2255,7 +2261,7 @@
 &gdsc_venus_core0 {
 	qcom,support-hw-trigger;
 	clock-names ="core0_clk";
-	clocks = <&clock_gcc clk_gcc_venus0_core0_vcodec0_clk>;
+	clocks = <&clock_gcc clk_GCC_VENUS0_CORE0_VCODEC0_CLK>;
 	status = "okay";
 };
 
