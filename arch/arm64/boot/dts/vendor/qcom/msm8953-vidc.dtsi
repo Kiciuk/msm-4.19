@@ -19,7 +19,7 @@
 		reg-names = "vidc", "efuse", "efuse2";
 		qcom,platform-version = <0x00180000 0x13>;
 		qcom,capability-version = <0x00002000 0x0d>;
-		interrupts = <0 44 0>;
+		interrupts = <0 44 IRQ_TYPE_LEVEL_HIGH>;
 		/* Regulators */
 		venus-supply = <&gdsc_venus>;
 		venus-core0-supply = <&gdsc_venus_core0>;
@@ -87,6 +87,9 @@
 				<&apps_iommu 0x828 0x01>,
 				<&apps_iommu 0x82c 0x01>,
 				<&apps_iommu 0x821 0x10>;
+			qcom,iommu-dma-addr-pool = <0x79000000 0x50000000
+				0xa1000000 0xc9000000>;
+                        qcom,iommu-faults = "non-fatal";
 			buffer-types = <0xfff>;
 			virtual-addr-pool = <0x79000000 0x50000000
 				0xa1000000 0xc9000000>;
@@ -101,9 +104,12 @@
 				<&apps_iommu 0x90e 0x0>,
 				<&apps_iommu 0x926 0x0>,
 				<&apps_iommu 0x929 0x2>;
+			qcom,iommu-dma-addr-pool = <0x51000000 0x28000000>;
+                        qcom,iommu-faults = "non-fatal";
 			buffer-types = <0x241>;
 			virtual-addr-pool = <0x51000000 0x28000000>;
 			qcom,secure-context-bank;
+			qcom,iommu-vmid = <0x9>; /*VMID_CP_BITSTREAM*/
 		};
 
 		secure_pixel_cb {
@@ -112,9 +118,12 @@
 			iommus = <&apps_iommu 0x904 0x8>,
 				<&apps_iommu 0x910 0x0>,
 				<&apps_iommu 0x92c 0x0>;
+			qcom,iommu-dma-addr-pool = <0x29000000 0x28000000>;
+                        qcom,iommu-faults = "non-fatal";
 			buffer-types = <0x106>;
 			virtual-addr-pool = <0x29000000 0x28000000>;
 			qcom,secure-context-bank;
+			qcom,iommu-vmid = <0xA>; /*VMID_CP_PIXEL*/
 		};
 
 		secure_non_pixel_cb {
@@ -124,9 +133,12 @@
 				<&apps_iommu 0x905 0xa>,
 				<&apps_iommu 0x925 0x8>,
 				<&apps_iommu 0x928 0x0>;
+			qcom,iommu-dma-addr-pool = <0x1000000 0x28000000>;
+                        qcom,iommu-faults = "non-fatal";
 			buffer-types = <0x480>;
 			virtual-addr-pool = <0x1000000 0x28000000>;
 			qcom,secure-context-bank;
+			qcom,iommu-vmid = <0xB>; /*VMID_CP_NON_PIXEL*/
 		};
 
 		/* Buses */
@@ -135,7 +147,7 @@
 			label = "venus-ddr";
 			qcom,bus-master = <MSM_BUS_MASTER_VIDEO_P0>;
 			qcom,bus-slave = <MSM_BUS_SLAVE_EBI_CH0>;
-			qcom,bus-governor = "venus-ddr-gov";
+			qcom,mode = "venus-ddr";
 			qcom,bus-range-kbps = <1000 2365000>;
 		};
 
@@ -144,7 +156,7 @@
 			label = "venus-arm9-ddr";
 			qcom,bus-master = <MSM_BUS_MASTER_VIDEO_P0>;
 			qcom,bus-slave = <MSM_BUS_SLAVE_EBI_CH0>;
-			qcom,bus-governor = "performance";
+			qcom,mode = "performance";
 			qcom,bus-range-kbps = <1 1>;
 		};
 	};
