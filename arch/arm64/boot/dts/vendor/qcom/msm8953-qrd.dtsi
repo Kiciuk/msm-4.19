@@ -39,8 +39,8 @@
 			synaptics,resume-in-workqueue;
 			/* Underlying clocks used by secure touch */
 			clock-names = "iface_clk", "core_clk";
-			clocks = <&gcc clk_GCC_BLSP1_AHB_CLK>,
-				 <&gcc clk_gcc_blsp1_qup3_i2c_apps_clk>;
+			clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+				 <&gcc GCC_BLSP1_QUP3_I2C_APPS_CLK>;
 		};
 	};
 
@@ -106,7 +106,7 @@
 		pinctrl-0 = <&nfc_int_active &nfc_disable_active
 						&nfc_clk_default>;
 		pinctrl-1 = <&nfc_int_suspend &nfc_disable_suspend>;
-		clocks = <&gcc clk_bb_clk2_pin>;
+		clocks = <&rpmcc RPM_SMD_BB_CLK2_PIN>;
 		clock-names = "ref_clk";
 	};
 };

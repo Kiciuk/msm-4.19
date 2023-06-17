@@ -855,7 +855,7 @@
 		qcom,ea-pc = <0x200>;
 		status = "disabled";
 	};
-
+//get from 429
 	gcc_mdss: qcom,gcc-mdss@1800000 {
 		compatible = "qcom,gcc-mdss-8953";
 		reg = <0x1800000 0x80000>;
@@ -865,7 +865,7 @@
 		clocks = <&mdss_dsi0_pll PIX0_MUX_CLK>,
 			<&mdss_dsi1_pll PIX1_MUX_CLK>,
 			<&mdss_dsi0_pll BYTE0_MUX_CLK>,
-			<&mdss_dsi1_pll BYTE1_MUX_CLK>,
+			<&mdss_dsi1_pll BYTE1_MUX_CLK>;
 		#clock-cells = <1>;
 	};
 
@@ -888,7 +888,7 @@
 		compatible = "qcom,cc-debug-8953";
 		reg = <0x1874000 0x4>;
 		reg-names = "cc_base";
-		clocks = <&clock_cpu clk_cpu_debug_pri_mux>;
+		//clocks = <&clock_cpu clk_cpu_debug_pri_mux>;
 		clock-names = "debug_cpu_clk";
 		#clock-cells = <1>;
 	};
@@ -898,7 +898,7 @@
 		reg = <0x1800000 0x80000>;
 		reg-names = "cc_base";
 		vdd_gfx-supply = <&gfx_vreg_corner>;
-		clocks = <&gcc RPM_SMD_XO_CLK_SRC>;
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
 		clock-names = "xo";
 		qcom,gcc_oxili_gfx3d_clk-opp-handle = <&msm_gpu>;
 		qcom,gfxfreq-corner =
@@ -1010,6 +1010,7 @@
 		clock-names = "l2_clk", "cpu0_clk", "cpu1_clk", "cpu2_clk",
 				"cpu3_clk", "cpu4_clk", "cpu5_clk",
 				"cpu6_clk", "cpu7_clk";
+		/* TODO cloccks
 		clocks = <&clock_cpu clk_cci_clk>,
 			 <&clock_cpu clk_a53_pwr_clk>,
 			 <&clock_cpu clk_a53_pwr_clk>,
@@ -1019,7 +1020,7 @@
 			 <&clock_cpu clk_a53_pwr_clk>,
 			 <&clock_cpu clk_a53_pwr_clk>,
 			 <&clock_cpu clk_a53_pwr_clk>;
-
+*/
 		qcom,cpufreq-table =
 			 <  652800 >,
 			 < 1036800 >,
@@ -1659,7 +1660,7 @@
 		qcom,wan-rx-ring-size = <192>; /* IPA WAN-rx-ring-size*/
 		qcom,lan-rx-ring-size = <192>; /* IPA LAN-rx-ring-size*/
 		clock-names = "core_clk";
-		clocks = <&gcc ipa_clk>;
+		clocks = <&rpmcc RPM_SMD_IPA_CLK>;
 		qcom,ee = <0>;
 		qcom,use-ipa-tethering-bridge;
 		qcom,modem-cfg-emb-pipe-flt;
@@ -1731,7 +1732,7 @@
 			<&gcc GCC_PCNOC_USB3_AXI_CLK>,
 			<&gcc GCC_USB30_MOCK_UTMI_CLK>,
 			<&gcc GCC_USB30_SLEEP_CLK>,
-			<&gcc xo_dwc3_clk>,
+			<&rpmcc RPM_SMD_XO_CLK_SRC>,
 			<&gcc GCC_USB_PHY_CFG_AHB_CLK>;
 
 		clock-names = "core_clk", "iface_clk", "utmi_clk",
@@ -1852,7 +1853,7 @@
 		qcom,phy-clk-scheme = "cml";
 		qcom,major-rev = <1>;
 
-		clocks = <&gcc bb_clk1>,
+		clocks = <&rpmcc RPM_SMD_BB_CLK1>,
 			 <&gcc GCC_QUSB_REF_CLK>,
 			 <&gcc GCC_USB_PHY_CFG_AHB_CLK>,
 			 <&gcc GCC_PCNOC_USB3_AXI_CLK>,
@@ -1966,7 +1967,7 @@
 		clocks = <&gcc GCC_USB3_AUX_CLK>,
 			 <&gcc GCC_USB3_PIPE_CLK>,
 			 <&gcc GCC_USB_PHY_CFG_AHB_CLK>,
-			 <&gcc bb_clk1>,
+			 <&rpmcc RPM_SMD_BB_CLK1>,
 			 <&gcc GCC_USB_SS_REF_CLK>;
 
 		clock-names = "aux_clk", "pipe_clk", "cfg_ahb_clk",
@@ -2005,7 +2006,7 @@
 		qcom,vdd_pll = <1800000>;
 		vdd_mss-uV = <RPM_SMD_REGULATOR_LEVEL_TURBO>;
 
-		clocks = <&gcc xo_pil_mss_clk>,
+		clocks =  <&rpmcc CXO_SMD_PIL_MSS_CLK>,
 			 <&gcc GCC_MSS_CFG_AHB_CLK>,
 			 <&gcc GCC_MSS_Q6_BIMC_AXI_CLK>,
 			 <&gcc GCC_BOOT_ROM_AHB_CLK>;
@@ -2045,7 +2046,7 @@
 		qcom,vdd_cx-uV-uA = <RPM_SMD_REGULATOR_LEVEL_TURBO 100000>;
 		qcom,mas-crypto = <&mas_crypto>;
 
-		clocks = <&gcc xo_pil_lpass_clk>,
+		clocks = <&rpmcc CXO_SMD_PIL_PRONTO_CLK>,
 			 <&gcc GCC_CRYPTO_CLK>,
 			 <&gcc GCC_CRYPTO_AHB_CLK>,
 			 <&gcc GCC_CRYPTO_AXI_CLK>,
@@ -2086,7 +2087,7 @@
 		vdd_pronto_pll-uV-uA = <1800000 18000>;
 		qcom,mas-crypto = <&mas_crypto>;
 
-		clocks = <&gcc xo_pil_pronto_clk>,
+		clocks = <&rpmcc CXO_SMD_PIL_PRONTO_CLK>,
 			 <&gcc GCC_CRYPTO_CLK>,
 			 <&gcc GCC_CRYPTO_AHB_CLK>,
 			 <&gcc GCC_CRYPTO_AXI_CLK>,
@@ -2221,12 +2222,10 @@
 		gpios = <&tlmm 76 0>, <&tlmm 77 0>, <&tlmm 78 0>,
 			<&tlmm 79 0>, <&tlmm 80 0>;
 
-		clocks = <&gcc xo_wlan_clk>,
-			 <&gcc rf_clk2>,
-			 <&clock_debug clk_gcc_debug_mux>,
-			 <&gcc wcnss_m_clk>;
+		clocks = <&rpmcc CXO_SMD_WLAN_CLK>,
+			 <&rpmcc RPM_SMD_RF_CLK2>;
 
-		clock-names = "xo", "rf_clk", "measure", "wcnss_debug";
+		clock-names = "xo", "rf_clk";
 
 		qcom,has-autodetect-xo;
 		qcom,is-pronto-v3;
@@ -2276,7 +2275,7 @@
 
 &gdsc_oxili_gx {
 	clock-names = "core_root_clk";
-	clocks =<&gcc_gfx clk_gfx3d_clk_src>;
+	clocks =<&gcc GFX3D_CLK_SRC>;
 	qcom,force-enable-root-clk;
 	parent-supply = <&gfx_vreg_corner>;
 	status = "okay";
@@ -2293,7 +2292,7 @@
 	clock-names = "core_clk", "bus_clk", "micro_clk",
 				"csi_clk";
 	clocks = <&gcc GCC_CAMSS_VFE0_CLK>,
-		<&gcc GCC_CAMSS_VFE_AXI_CLK>,
+		<&gcc GCC_CAMSS_VFE0_AXI_CLK>,
 		<&gcc GCC_CAMSS_MICRO_AHB_CLK>,
 		<&gcc GCC_CAMSS_CSI_VFE0_CLK>;
 	status = "okay";
@@ -2318,7 +2317,7 @@
 
 &gdsc_oxili_cx {
 	clock-names = "core_clk";
-	clocks = <&gcc_gfx clk_gcc_oxili_gfx3d_clk>;
+	clocks = <&gcc GCC_OXILI_GFX3D_CLK>;
 	status = "okay";
 };
 
