@@ -503,8 +503,7 @@ dtb-$(CONFIG_ARCH_MSM8953) += msm8953-cdp.dtb \
 	msm8953-pmi8937-cdp.dtb \
 	msm8953-pmi8937-mtp.dtb \
 	msm8953-pmi8940-ext-codec-mtp.dtb \
-	msm8953-pmi8937-ext-codec-mtp.dtb \
-	msm8953-pmi632-cdp-s2.dtb \
+	msm8953-pmi8937-ext-codec-mtp.dtb 
 	
 dtb-$(CONFIG_ARCH_SDM439) += sdm439-mtp.dtb \
 	sdm439-cdp.dtb \
