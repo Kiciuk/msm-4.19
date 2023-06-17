@@ -39,7 +39,7 @@
 			synaptics,resume-in-workqueue;
 			/* Underlying clocks used by secure touch */
 			clock-names = "iface_clk", "core_clk";
-			clocks = <&gcc clk_gcc_blsp1_ahb_clk>,
+			clocks = <&gcc clk_GCC_BLSP1_AHB_CLK>,
 				 <&gcc clk_gcc_blsp1_qup3_i2c_apps_clk>;
 		};
 	};

@@ -9,7 +9,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
+#include <dt-bindings/clock/mdss-14nm-pll-clk.h>
 &soc {
 	mdss_mdp: qcom,mdss_mdp@1a00000 {
 		compatible = "qcom,mdss_mdp";
@@ -314,11 +314,11 @@
 			vdd-supply = <&pm8953_l17>;
 			vddio-supply = <&pm8953_l6>;
 
-			clocks = <&gcc GCC_MDSS_BYTE0_CLK>,
-				<&gcc GCC_MDSS_PCLK0_CLK>,
+			clocks = <&gcc_mdss GCC_MDSS_BYTE0_CLK>,
+				<&gcc_mdss GCC_MDSS_PCLK0_CLK>,
 				<&gcc GCC_MDSS_ESC0_CLK>,
-				<&gcc BYTE0_CLK_SRC>,
-				<&gcc PCLK0_CLK_SRC>,
+				<&gcc_mdss BYTE0_CLK_SRC>,
+				<&gcc_mdss PCLK0_CLK_SRC>,
 				 <&mdss_dsi0_pll BYTE0_MUX_CLK>,
 				 <&mdss_dsi0_pll PIX0_MUX_CLK>,
 				 <&mdss_dsi0_pll BYTE0_SRC_CLK>,
@@ -359,19 +359,17 @@
 			vdd-supply = <&pm8953_l17>;
 			vddio-supply = <&pm8953_l6>;
 
-			clocks = <&gcc_mdss clk_gcc_mdss_byte1_clk>,
-				<&gcc_mdss clk_gcc_mdss_pclk1_clk>,
+			clocks = <&gcc_mdss GCC_MDSS_BYTE1_CLK>,
+				<&gcc_mdss GCC_MDSS_PCLK1_CLK>,
 				<&gcc GCC_MDSS_ESC1_CLK>,
-				<&gcc_mdss clk_byte1_clk_src>,
-				<&gcc_mdss clk_pclk1_clk_src>,
-				<&mdss_dsi1_pll clk_dsi1pll_byte_clk_mux>,
-				<&mdss_dsi1_pll clk_dsi1pll_pixel_clk_mux>,
-				<&mdss_dsi1_pll clk_dsi1pll_byte_clk_src>,
-				<&mdss_dsi1_pll clk_dsi1pll_pixel_clk_src>,
-				<&mdss_dsi1_pll
-					clk_dsi1pll_shadow_byte_clk_src>,
-				<&mdss_dsi1_pll
-					clk_dsi1pll_shadow_pixel_clk_src>;
+				<&gcc_mdss BYTE1_CLK_SRC>,
+				<&gcc_mdss PCLK1_CLK_SRC>,
+				 <&mdss_dsi1_pll BYTE1_MUX_CLK>,
+				 <&mdss_dsi1_pll PIX1_MUX_CLK>,
+				 <&mdss_dsi1_pll BYTE1_SRC_CLK>,
+				 <&mdss_dsi1_pll PIX1_SRC_CLK>,
+				 <&mdss_dsi1_pll SHADOW_BYTE1_SRC_CLK>,
+				 <&mdss_dsi1_pll SHADOW_PIX1_SRC_CLK>;
 			clock-names = "byte_clk", "pixel_clk", "core_clk",
 				"byte_clk_rcg", "pixel_clk_rcg",
 				"pll_byte_clk_mux", "pll_pixel_clk_mux",

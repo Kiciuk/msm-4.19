@@ -194,11 +194,11 @@
 			<&gcc clk_gcc_camss_csi2rdi_clk>,
 			<&gcc clk_gcc_camss_csi2pix_clk>,
 			<&gcc clk_vfe0_clk_src>,
-			<&gcc clk_gcc_camss_vfe0_clk>,
-			<&gcc clk_gcc_camss_csi_vfe0_clk>,
+			<&gcc clk_GCC_CAMSS_VFE0_CLK>,
+			<&gcc clk_GCC_CAMSS_CSI_VFE0_CLK>,
 			<&gcc clk_vfe1_clk_src>,
-			<&gcc clk_gcc_camss_vfe1_clk>,
-			<&gcc clk_gcc_camss_csi_vfe1_clk>;
+			<&gcc clk_GCC_CAMSS_VFE1_CLK>,
+			<&gcc clk_GCC_CAMSS_CSI_VFE1_CLK>;
 		clock-names = "ispif_ahb_clk",
 			"camss_ahb_clk", "camss_top_ahb_clk",
 			"camss_ahb_src",
@@ -240,10 +240,10 @@
 		clocks = <&gcc clk_gcc_camss_top_ahb_clk>,
 			<&gcc clk_gcc_camss_ahb_clk>,
 			<&gcc clk_vfe0_clk_src>,
-			<&gcc clk_gcc_camss_vfe0_clk>,
-			<&gcc clk_gcc_camss_csi_vfe0_clk>,
+			<&gcc clk_GCC_CAMSS_VFE0_CLK>,
+			<&gcc clk_GCC_CAMSS_CSI_VFE0_CLK>,
 			<&gcc clk_gcc_camss_vfe_ahb_clk>,
-			<&gcc clk_gcc_camss_vfe_axi_clk>,
+			<&gcc clk_GCC_CAMSS_VFE_AXI_CLK>,
 			<&gcc clk_gcc_camss_ispif_ahb_clk>;
 		clock-names = "camss_top_ahb_clk", "camss_ahb_clk",
 			"vfe_clk_src", "camss_vfe_vfe_clk",
@@ -290,10 +290,10 @@
 		clocks = <&gcc clk_gcc_camss_top_ahb_clk>,
 			<&gcc clk_gcc_camss_ahb_clk>,
 			<&gcc clk_vfe1_clk_src>,
-			<&gcc clk_gcc_camss_vfe1_clk>,
-			<&gcc clk_gcc_camss_csi_vfe1_clk>,
+			<&gcc clk_GCC_CAMSS_VFE1_CLK>,
+			<&gcc clk_GCC_CAMSS_CSI_VFE1_CLK>,
 			<&gcc clk_gcc_camss_vfe1_ahb_clk>,
-			<&gcc clk_gcc_camss_vfe1_axi_clk>,
+			<&gcc clk_GCC_CAMSS_VFE1_AXI_CLK>,
 			<&gcc clk_gcc_camss_ispif_ahb_clk>;
 		clock-names = "camss_top_ahb_clk" , "camss_ahb_clk",
 			"vfe_clk_src", "camss_vfe_vfe_clk",
@@ -378,7 +378,7 @@
 			"camss_top_ahb_clk", "camss_ahb_clk";
 		clocks = <&gcc clk_gcc_camss_jpeg0_clk>,
 			<&gcc clk_gcc_camss_jpeg_ahb_clk>,
-			<&gcc clk_gcc_camss_jpeg_axi_clk>,
+			<&gcc clk_GCC_CAMSS_JPEG_AXI_CLK>,
 			<&gcc clk_gcc_camss_top_ahb_clk>,
 			<&gcc clk_gcc_camss_ahb_clk>;
 		qcom,clock-rates = <266670000 0 0 0 0>;
@@ -418,9 +418,9 @@
 			<&gcc clk_gcc_camss_top_ahb_clk>,
 			<&gcc clk_cpp_clk_src>,
 			<&gcc clk_gcc_camss_cpp_ahb_clk>,
-			<&gcc clk_gcc_camss_cpp_axi_clk>,
-			<&gcc clk_gcc_camss_cpp_clk>,
-			<&gcc clk_gcc_camss_micro_ahb_clk>,
+			<&gcc clk_GCC_CAMSS_CPP_AXI_CLK>,
+			<&gcc clk_GCC_CAMSS_CPP_CLK>,
+			<&gcc clk_GCC_CAMSS_MICRO_AHB_CLK>,
 			<&gcc clk_gcc_camss_ahb_clk>;
 		clock-names = "camss_ahb_src", "camss_top_ahb_clk",
 			"cpp_core_clk", "camss_vfe_cpp_ahb_clk",
