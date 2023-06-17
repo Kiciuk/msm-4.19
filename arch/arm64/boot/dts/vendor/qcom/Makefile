@@ -495,6 +495,16 @@ qm215-qrd-overlay.dtbo-base := qm215.dtb
 qcm2150-qrd-overlay.dtbo-base := qcm2150.dtb
 qm215-qrd-smb1360-overlay.dtbo-base := qm215.dtb
 else
+dtb-$(CONFIG_ARCH_MSM8953) += msm8953-cdp.dtb \
+	msm8953-mtp.dtb \
+	msm8953-qrd-sku3.dtb \
+	msm8953-pmi8940-cdp.dtb \
+	msm8953-pmi8940-mtp.dtb \
+	msm8953-pmi8937-cdp.dtb \
+	msm8953-pmi8937-mtp.dtb \
+	msm8953-pmi8940-ext-codec-mtp.dtb \
+	msm8953-pmi8937-ext-codec-mtp.dtb 
+	
 dtb-$(CONFIG_ARCH_SDM439) += sdm439-mtp.dtb \
 	sdm439-cdp.dtb \
 	sdm439-qrd.dtb \
