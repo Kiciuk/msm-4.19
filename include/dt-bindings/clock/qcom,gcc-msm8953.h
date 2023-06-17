@@ -27,6 +27,8 @@
 #define BLSP2_QUP4_SPI_APPS_CLK_SRC		20
 #define BLSP2_UART1_APPS_CLK_SRC		21
 #define BLSP2_UART2_APPS_CLK_SRC		22
+#define BYTE0_CLK_SRC				23
+#define BYTE1_CLK_SRC				24
 #define CAMSS_GP0_CLK_SRC			25
 #define CAMSS_GP1_CLK_SRC			26
 #define CAMSS_TOP_AHB_CLK_SRC			27
@@ -133,9 +135,13 @@
 #define GCC_MDP_TBU_CLK				128
 #define GCC_MDSS_AHB_CLK			129
 #define GCC_MDSS_AXI_CLK			130
+#define GCC_MDSS_BYTE0_CLK			131
+#define GCC_MDSS_BYTE1_CLK			132
 #define GCC_MDSS_ESC0_CLK			133
 #define GCC_MDSS_ESC1_CLK			134
 #define GCC_MDSS_MDP_CLK			135
+#define GCC_MDSS_PCLK0_CLK			136
+#define GCC_MDSS_PCLK1_CLK			137
 #define GCC_MDSS_VSYNC_CLK			138
 #define GCC_MSS_CFG_AHB_CLK			139
 #define GCC_MSS_Q6_BIMC_AXI_CLK			140
@@ -174,22 +180,24 @@
 #define GP1_CLK_SRC				173
 #define GP2_CLK_SRC				174
 #define GP3_CLK_SRC				175
-#define GPLL0					176
-#define GPLL0_EARLY				177
+#define GPLL0_OUT_AUX				176
+#define GPLL0_OUT_MAIN				177
 #define GPLL2					178
-#define GPLL2_EARLY				179
-#define GPLL3					180
-#define GPLL3_EARLY				181
+#define GPLL2_OUT_AUX2				179
+#define GPLL3_OUT_MAIN_DIV			180
+#define GPLL3_OUT_MAIN				181
 #define GPLL4					182
-#define GPLL4_EARLY				183
-#define GPLL6					184
-#define GPLL6_EARLY				185
+#define GPLL4_OUT_MAIN				183
+#define GPLL6_OUT_MAIN_DIV			184
+#define GPLL6				        185
 #define JPEG0_CLK_SRC				186
 #define MCLK0_CLK_SRC				187
 #define MCLK1_CLK_SRC				188
 #define MCLK2_CLK_SRC				189
 #define MCLK3_CLK_SRC				190
 #define MDP_CLK_SRC				191
+#define PCLK0_CLK_SRC				192
+#define PCLK1_CLK_SRC				193
 #define PDM2_CLK_SRC				194
 #define RBCPR_GFX_CLK_SRC			195
 #define SDCC1_APPS_CLK_SRC			196
@@ -202,6 +210,8 @@
 #define VFE0_CLK_SRC				203
 #define VFE1_CLK_SRC				204
 #define VSYNC_CLK_SRC				205
+#define MDSS_MDP_VOTE_CLK                       206
+#define MDSS_ROTATOR_VOTE_CLK                   207
 
 /* GCC block resets */
 #define GCC_CAMSS_MICRO_BCR			0
@@ -222,15 +232,5 @@
 #define VENUS_GDSC				7
 #define VFE0_GDSC				8
 #define VFE1_GDSC				9
-
-/* MDSS crap */
-#define GCC_MDSS_BYTE0_CLK			0
-#define GCC_MDSS_BYTE1_CLK			1
-#define GCC_MDSS_PCLK0_CLK			2
-#define GCC_MDSS_PCLK1_CLK			3
-#define BYTE0_CLK_SRC				4
-#define BYTE1_CLK_SRC				5
-#define PCLK0_CLK_SRC				6
-#define PCLK1_CLK_SRC				7
 
 #endif

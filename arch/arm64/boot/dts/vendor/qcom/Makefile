@@ -502,6 +502,14 @@ dtb-$(CONFIG_ARCH_SDM439) += sdm439-mtp.dtb \
 	sda439-cdp.dtb \
 	sdm439-external-codec-mtp.dtb \
 	sdm439-rcm.dtb
+	
+dtb-$(CONFIG_ARCH_MSM8953) += msm8953-mtp.dtb \
+	msm8953-qrd.dtb \
+	msm8953-mtp.dtb \
+	msm8953-cdp.dtb \
+	msm8953-external-codec-mtp.dtb 
+	
+	
 dtb-$(CONFIG_ARCH_QM215) += qm215-qrd.dtb \
 	qcm2150-qrd.dtb \
 	qm215-qrd-smb1360.dtb

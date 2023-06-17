@@ -19,6 +19,7 @@
 #include <linux/sched.h>
 #if IS_ENABLED(CONFIG_AVTIMER_LEGACY)
 #include <media/msmb_isp.h>
+void __weak msm_isp_set_avtimer_fptr(struct avtimer_fptr_t avtimer_func) {}
 #endif
 #include <ipc/apr.h>
 #include <dsp/q6core.h>
