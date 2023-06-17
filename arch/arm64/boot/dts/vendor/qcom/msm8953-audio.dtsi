@@ -337,7 +337,7 @@
 		pinctrl-0 = <&tasha_mclk_default>;
 		pinctrl-1 = <&tasha_mclk_default>;
 		qcom,audio-ref-clk-gpio = <&pm8953_gpios 1 0>;
-		clocks = <&clock_gcc clk_div_clk2>;
+		clocks = <&gcc clk_div_clk2>;
 	};
 
 	wcd_rst_gpio: msm_cdc_pinctrl@67 {

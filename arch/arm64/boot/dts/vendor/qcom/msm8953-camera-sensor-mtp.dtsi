@@ -71,8 +71,8 @@
 			"CAM_STANDBY0",
 			"CAM_VANA";
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc clk_mclk0_clk_src>,
+				<&gcc clk_gcc_camss_mclk0_clk>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <19200000 0>;
 	};
@@ -110,8 +110,8 @@
 		qcom,sensor-position = <1>;
 		qcom,sensor-mode = <0>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk1_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk1_clk>;
+		clocks = <&gcc clk_mclk1_clk_src>,
+			<&gcc clk_gcc_camss_mclk1_clk>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <19200000 0>;
 	};
@@ -146,8 +146,8 @@
 			"CAM_RESET1",
 			"CAM_STANDBY1";
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk2_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk2_clk>;
+		clocks = <&gcc clk_mclk2_clk_src>,
+				<&gcc clk_gcc_camss_mclk2_clk>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <19200000 0>;
 	};
@@ -195,8 +195,8 @@
 		qcom,sensor-mode = <0>;
 		qcom,cci-master = <0>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk0_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk0_clk>;
+		clocks = <&gcc clk_mclk0_clk_src>,
+				<&gcc clk_gcc_camss_mclk0_clk>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
@@ -238,8 +238,8 @@
 		qcom,sensor-mode = <1>;
 		qcom,cci-master = <1>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk2_clk_src>,
-				<&clock_gcc clk_gcc_camss_mclk2_clk>;
+		clocks = <&gcc clk_mclk2_clk_src>,
+				<&gcc clk_gcc_camss_mclk2_clk>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
@@ -282,8 +282,8 @@
 		qcom,sensor-mode = <0>;
 		qcom,cci-master = <1>;
 		status = "ok";
-		clocks = <&clock_gcc clk_mclk1_clk_src>,
-			<&clock_gcc clk_gcc_camss_mclk1_clk>;
+		clocks = <&gcc clk_mclk1_clk_src>,
+			<&gcc clk_gcc_camss_mclk1_clk>;
 		clock-names = "cam_src_clk", "cam_clk";
 		qcom,clock-rates = <24000000 0>;
 	};
