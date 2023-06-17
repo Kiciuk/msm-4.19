@@ -17,13 +17,13 @@
 		reg = <0x1000000 0x300000>;
 		reg-names = "pinctrl_regs";
 		interrupts = <0 208 0>;
-		interrupts-extended = <&wakegic GIC_SPI 208 IRQ_TYPE_NONE>;
+		interrupts-extended = <&wakegic GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
 		gpio-controller;
 		#gpio-cells = <2>;
 		interrupt-controller;
-		interrupt-parent = <&wakegpio>;
+		wakeup-parent = <&wakegpio>;
 		#interrupt-cells = <2>;
-
+//TODO:  irqdomain-map
 		pmx-uartconsole {
 			uart_console_active: uart_console_active {
 				mux {

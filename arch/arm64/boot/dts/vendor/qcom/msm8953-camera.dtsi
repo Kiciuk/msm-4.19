@@ -338,10 +338,14 @@
 		compatible = "qcom,vfe";
 		num_child = <2>;
 	};
+	
+//TODO: qcom,iommu-dma-addr-pool how do i obtain them?
 
 	qcom,cam_smmu {
 		status = "ok";
 		compatible = "qcom,msm-cam-smmu";
+		qcom,iommu-dma-addr-pool = <0x00020000 0x78000000>;
+		
 		msm_cam_smmu_cb1: msm_cam_smmu_cb1 {
 			compatible = "qcom,msm-cam-smmu-cb";
 			iommus = <&apps_iommu 0x400 0x00>,
@@ -391,14 +395,6 @@
 		qcom,msm-bus,num-paths = <1>;
 		qcom,msm-bus,vectors-KBps = <62 512 0 0>,
 			<62 512 800000 800000>;
-	};
-
-	qcom,irqrouter@1b00000 {
-		status = "ok";
-		cell-index = <0>;
-		compatible = "qcom,irqrouter";
-		reg = <0x1b00000 0x100>;
-		reg-names = "irqrouter";
 	};
 
 	qcom,cpp@1b04000 {
