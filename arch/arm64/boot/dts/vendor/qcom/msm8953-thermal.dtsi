@@ -11,7 +11,7 @@
  */
 
 #include <dt-bindings/thermal/thermal.h>
-/*
+
 &apsscc {
 	qcom,cpu-isolation {
 		compatible = "qcom,cpu-isolate";
@@ -56,7 +56,7 @@
 		};
 	};
 };
-*/
+
 
 &soc {
 	qmi-tmd-devices {
