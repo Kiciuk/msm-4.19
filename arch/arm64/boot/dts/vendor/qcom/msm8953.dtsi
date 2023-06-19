@@ -239,7 +239,7 @@
 		clock-names = "apb_pclk";
 		qcom,save-reg;
 	};
-//TODO:Port driver
+
 	apc_apm: apm@b111000 {
 		compatible = "qcom,msm8953-apm";
 		reg = <0xb111000 0x1000>;
@@ -258,7 +258,7 @@
 		reg = <0x0b000000 0x1000>,
 		      <0x0b002000 0x1000>;
 	};
-//TODO:Port or check
+
 	wakegic: wake-gic@601d4 {
 		compatible = "qcom,mpm-gic-msm8953", "qcom,mpm-gic";
 		interrupts-extended = <&wakegic GIC_SPI 171 IRQ_TYPE_EDGE_RISING>;
@@ -277,14 +277,7 @@
 		interrupt-parent = <&intc>;
 		#interrupt-cells = <2>;
 	};
-/*
-	qcom,msm-gladiator@b1c0000 {
-		compatible = "qcom,msm-gladiator";
-		reg = <0x0b1c0000 0x4000>;
-		reg-names = "gladiator_base";
-		interrupts = <0 22 0>;
-	};
-*/
+
 	timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <1 2 0xff08>,
@@ -587,7 +580,7 @@
                 };
 
 	};
-//TODO: 8953 tsens pls
+
 	tsens0: tsens@4a8000 {
 		compatible = "qcom,msm8953-tsens";
 		reg = <0x4a8000 0x1000>,
@@ -1020,9 +1013,9 @@
 		qcom,ea-pc = <0x200>;
 		status = "disabled";
 	};
-//get from 429
+
 	gcc_mdss: qcom,gcc-mdss@1800000 {
-		compatible = "qcom,gcc-mdss-8953";
+		compatible = "qcom,gcc-mdss-msm8953";
 		reg = <0x1800000 0x80000>;
 		reg-names = "cc_base";
 		clock-names = "pclk0_src", "pclk1_src",
@@ -1040,25 +1033,13 @@
 	};
 
 	gcc: qcom,gcc@1800000 {
-		compatible = "qcom,gcc-8953";
+		compatible = "qcom,gcc-msm8953", "syscon";
 		reg = <0x1800000 0x80000>,
 			 <0x00a4124 0x08>;
 		reg-names = "cc_base", "efuse";
 		vdd_dig-supply = <&pm8953_s2_level>;
-		#clock-cells = <1>;
-		#reset-cells = <1>;
-	};
-
-
-/*
-	gcc_gfx: qcom,gcc-gfx@1800000 {
-		compatible = "qcom,gcc-gfx-8953";
-		reg = <0x1800000 0x80000>;
-		reg-names = "cc_base";
-		vdd_gfx-supply = <&gfx_vreg_corner>;
-		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
-		clock-names = "xo";
 		qcom,gcc_oxili_gfx3d_clk-opp-handle = <&msm_gpu>;
+		vdd_gfx-supply = <&gfx_vreg_corner>;
 		qcom,gfxfreq-corner =
 			 <         0   0 >,
 			 < 133330000   1 >,  
@@ -1068,9 +1049,13 @@
 			 < 510000000   5 >,  
 			 < 560000000   6 >,  
 			 < 650000000   7 >;  
+			 
+		clocks = <&rpmcc RPM_SMD_XO_CLK_SRC>;
+		clock-names = "bi_tcxo";
 		#clock-cells = <1>;
+		#reset-cells = <1>;
 	};
-*/
+
 	apsscc: qcom,clock-cpu@b111050 {
 		compatible = "qcom,cpu-clock-msm8953";
 		reg =   <0xb011050 0x8>,
@@ -1083,7 +1068,7 @@
 		reg-names = "apcs-c1-rcg-base", "spm_c1_base",
 			"apcs-cci-rcg-base", "apcs-c0-rcg-base",
 			"apcs_pll0", "spm_c0_base", "efuse";
-		cpu-vdd-supply = <&apc_cpr>;
+		cpu-vdd-supply = <&apc_cpr>; //pm8953_s5?
 		vdd_dig_ao-supply = <&pm8953_s7_level_ao>;
 		vdd_hf_pll-supply = <&apc_cpr>;
 		clocks = <&rpmcc RPM_SMD_XO_A_CLK_SRC>,
