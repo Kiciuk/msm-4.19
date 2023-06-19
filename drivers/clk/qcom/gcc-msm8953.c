@@ -23,6 +23,7 @@
 
 #define F_SLEW(f, s, h, m, n, sf) { (f), (s), (2 * (h) - 1), (m), (n), (sf) }
 
+static DEFINE_VDD_REGS_INIT(vdd_gfx, 1);
 static DEFINE_VDD_REGULATORS(vdd_cx, VDD_NUM, 1, vdd_corner);
 
 enum {
@@ -3835,6 +3836,7 @@ static struct clk_branch gcc_oxili_gfx3d_clk = {
 			.num_parents = 1,
 			.ops = &clk_branch2_ops,
 			.flags = CLK_SET_RATE_PARENT,
+			.vdd_class = &vdd_gfx,
 		}
 	}
 };
@@ -4517,6 +4519,19 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
 		return PTR_ERR(vdd_cx.regulator[0]);
 	}
 	
+	/* GFX Rail Regulator for GFX3D clock */
+	vdd_gfx.regulator[0] = devm_regulator_get(&pdev->dev, "vdd_gfx");
+	if (IS_ERR(vdd_gfx.regulator[0])) {
+		if (!(PTR_ERR(vdd_gfx.regulator[0]) == -EPROBE_DEFER))
+			dev_err(&pdev->dev,
+					"Unable to get vdd_gfx regulator\n");
+		return PTR_ERR(vdd_gfx.regulator[0]);
+	}
+
+        /* GFX rail fmax data linked to branch clock */
+	of_get_fmax_vdd_class(pdev, &gpucc_gfx3d_clk.clkr.hw,
+						"qcom,gfxfreq-corner", 1);
+
 	ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register hardware clock\n");
