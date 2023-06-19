@@ -239,7 +239,7 @@
 		clock-names = "apb_pclk";
 		qcom,save-reg;
 	};
-
+//TODO:Port driver
 	apc_apm: apm@b111000 {
 		compatible = "qcom,msm8953-apm";
 		reg = <0xb111000 0x1000>;
@@ -258,7 +258,7 @@
 		reg = <0x0b000000 0x1000>,
 		      <0x0b002000 0x1000>;
 	};
-
+//TODO:Port or check
 	wakegic: wake-gic@601d4 {
 		compatible = "qcom,mpm-gic-msm8953", "qcom,mpm-gic";
 		interrupts-extended = <&wakegic GIC_SPI 171 IRQ_TYPE_EDGE_RISING>;
@@ -277,14 +277,14 @@
 		interrupt-parent = <&intc>;
 		#interrupt-cells = <2>;
 	};
-
+/*
 	qcom,msm-gladiator@b1c0000 {
 		compatible = "qcom,msm-gladiator";
 		reg = <0x0b1c0000 0x4000>;
 		reg-names = "gladiator_base";
 		interrupts = <0 22 0>;
 	};
-
+*/
 	timer {
 		compatible = "arm,armv8-timer";
 		interrupts = <1 2 0xff08>,
@@ -587,7 +587,7 @@
                 };
 
 	};
-
+//TODO: 8953 tsens pls
 	tsens0: tsens@4a8000 {
 		compatible = "qcom,msm8953-tsens";
 		reg = <0x4a8000 0x1000>,
@@ -1027,10 +1027,10 @@
 		reg-names = "cc_base";
 		clock-names = "pclk0_src", "pclk1_src",
 			"byte0_src", "byte1_src";
-		clocks = <&mdss_dsi0_pll PIX0_MUX_CLK>,
-			<&mdss_dsi1_pll PIX1_MUX_CLK>,
-			<&mdss_dsi0_pll BYTE0_MUX_CLK>,
-			<&mdss_dsi1_pll BYTE1_MUX_CLK>;
+		clocks = <&mdss_dsi0_pll PIX0_SRC_CLK>,
+			<&mdss_dsi1_pll PIX1_SRC_CLK>,
+			<&mdss_dsi0_pll BYTE0_SRC_CLK>,
+			<&mdss_dsi1_pll BYTE1_SRC_CLK>;
 		#clock-cells = <1>;
 	};
 
@@ -1049,15 +1049,8 @@
 		#reset-cells = <1>;
 	};
 
-	clock_debug: qcom,cc-debug@1874000 {
-		compatible = "qcom,cc-debug-8953";
-		reg = <0x1874000 0x4>;
-		reg-names = "cc_base";
-		//clocks = <&clock_cpu clk_cpu_debug_pri_mux>;
-		clock-names = "debug_cpu_clk";
-		#clock-cells = <1>;
-	};
 
+/*
 	gcc_gfx: qcom,gcc-gfx@1800000 {
 		compatible = "qcom,gcc-gfx-8953";
 		reg = <0x1800000 0x80000>;
@@ -1068,16 +1061,16 @@
 		qcom,gcc_oxili_gfx3d_clk-opp-handle = <&msm_gpu>;
 		qcom,gfxfreq-corner =
 			 <         0   0 >,
-			 < 133330000   1 >,  /* Min SVS   */
-			 < 216000000   2 >,  /* Low SVS   */
-			 < 320000000   3 >,  /* SVS       */
-			 < 400000000   4 >,  /* SVS Plus  */
-			 < 510000000   5 >,  /* NOM       */
-			 < 560000000   6 >,  /* Nom Plus  */
-			 < 650000000   7 >;  /* Turbo     */
+			 < 133330000   1 >,  
+			 < 216000000   2 >,  
+			 < 320000000   3 >,  
+			 < 400000000   4 >,  
+			 < 510000000   5 >,  
+			 < 560000000   6 >,  
+			 < 650000000   7 >;  
 		#clock-cells = <1>;
 	};
-
+*/
 	apsscc: qcom,clock-cpu@b111050 {
 		compatible = "qcom,cpu-clock-msm8953";
 		reg =   <0xb011050 0x8>,
