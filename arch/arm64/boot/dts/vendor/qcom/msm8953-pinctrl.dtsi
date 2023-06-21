@@ -877,6 +877,26 @@
 				};
 			};
 		};
+		
+		i2c_4 {
+			i2c_4_active: i2c_4_active {
+				i2c_4 {
+					pins = "gpio14", "gpio15";
+					function = "blsp_i2c4";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+
+			i2c_4_sleep: i2c_4_sleep {
+				i2c_4 {
+					pins = "gpio14", "gpio15";
+					function = "blsp_i2c4";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+		};
 
 		i2c_5 {
 			i2c_5_active: i2c_5_active {
@@ -1489,6 +1509,63 @@
 			};
 		};
 
+
+	spi_8 {
+		spi_8_active: spi_8_active {
+			mux {
+				/* MOSI, MISO, CLK */
+				pins = "gpio96", "gpio97", "gpio99";
+				function = "blsp_spi8";
+			};
+
+			config {
+				pins = "gpio96", "gpio97", "gpio99";
+				drive-strength = <12>; /* 12 MA */
+				bias-disable = <0>; /* No PULL */
+			};
+		};
+
+		spi_8_sleep: spi_8_sleep {
+			mux {
+				/* MOSI, MISO, CLK */
+				pins = "gpio96", "gpio97", "gpio99";
+				function = "blsp_spi8";
+			};
+
+			config {
+				pins = "gpio96", "gpio97", "gpio99";
+				drive-strength = <2>; /* 2 MA */
+				bias-pull-down; /* PULL Down */
+			};
+		};
+
+		spi8_cs0_active: cs0_active {
+			mux {
+				pins = "gpio98";
+				function = "blsp_spi8";
+			};
+
+			config {
+				pins = "gpio98";
+				drive-strength = <2>;
+				bias-disable = <0>;
+			};
+		};
+
+		spi8_cs0_sleep: cs0_sleep {
+			mux {
+				pins = "gpio98";
+				function = "blsp_spi8";
+			};
+
+			config {
+				pins = "gpio98";
+				drive-strength = <2>;
+				bias-disable = <0>;
+			};
+		};
+	};
+	
 		/* add pingrp for touchscreen */
 		ts_int_default: ts_int_default {
 			mux {
