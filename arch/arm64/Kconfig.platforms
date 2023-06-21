@@ -285,6 +285,13 @@ config ARCH_MSM8953
 	  This enables support for the MSM8953 chipset. If you do not
 	  wish to build a kernel that runs on this chipset, say 'N' here.
 
+config DEEN_DTB
+	bool "Enable Support for Motorola One(deen)"
+	depends on ARCH_MSM8953
+	help
+	  This enables support for the moto deen. If you do not
+	  wish to build a kernel that runs on this device, say 'N' here.
+
 config ARCH_SDM450
 	bool "Enable Support for Qualcomm Technologies Inc. SDM450"
 	depends on ARCH_QCOM

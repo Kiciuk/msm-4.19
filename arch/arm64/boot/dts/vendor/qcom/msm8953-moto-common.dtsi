@@ -11,12 +11,12 @@
  */
 
 #include "msm8953.dtsi"
-#include "msm-pmi8950.dtsi"
+#include "pmi8950.dtsi"
 #include "msm8953-pinctrl.dtsi"
 #include "msm8953-moto-pinctrl.dtsi"
 #include "dsi-panel-mot-dummy-qhd-video.dtsi"
 #include "carrier-channel-ids.dtsi"
-#include <moto-mem-reserve.h>
+#include "moto-mem-reserve.h"
 
 / {
 	aliases {
@@ -86,377 +86,6 @@
 		regulator-always-on;
 	};
 
-	i2c_2: i2c@78b6000 { /* BLSP1 QUP2 */
-		compatible = "qcom,i2c-msm-v2";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg-names = "qup_phys_addr";
-		reg = <0x78b6000 0x1000>;
-		interrupt-names = "qup_irq";
-		interrupts = <0 96 0>;
-		qcom,clk-freq-out = <400000>;
-		qcom,clk-freq-in  = <19200000>;
-		clock-names = "iface_clk", "core_clk";
-		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
-			<&clock_gcc clk_gcc_blsp1_qup2_i2c_apps_clk>;
-
-		pinctrl-names = "i2c_active", "i2c_sleep";
-		pinctrl-0 = <&i2c_2_active>;
-		pinctrl-1 = <&i2c_2_sleep>;
-		qcom,noise-rjct-scl = <0>;
-		qcom,noise-rjct-sda = <0>;
-		qcom,master-id = <86>;
-		dmas = <&dma_blsp1 6 64 0x20000020 0x20>,
-			<&dma_blsp1 7 32 0x20000020 0x20>;
-		dma-names = "tx", "rx";
-		cs35l34@40 {
-			compatible = "cirrus,cs35l34";
-			reg = <0x40>;
-
-			cirrus,gain-zc = <1>;
-			pinctrl-names = "default";
-			pinctrl-0 = <&cs35l34_reset_default>;
-		};
-
-		stmvl53l0@29 {
-			compatible = "st,stmvl53l0_i2c";
-			reg = <0x29>;
-			vdd-supply = <&pm8950_l22>;
-			gpios = <&tlmm 86 0>, <&tlmm 43 0>;
-			qcom,gpio-reset = <0>;
-			qcom,gpio-req-tbl-num = <0 1>;
-			qcom,gpio-req-tbl-flags = <0 1>;
-			qcom,gpio-req-tbl-label ="TOF_XSHUTDOWN","TOF_INT";
-			pinctrl-names = "laser_default", "laser_suspend";
-			pinctrl-0 = <&laser_active >;
-			pinctrl-1 = <&laser_suspend >;
-			st,sensorthreshold = <60 65>;
-			st,xtalkval = <19>;
-		};
-
-		fusb302@22 {
-			compatible = "fairchild,fusb302";
-			reg = <0x22>;
-			gpios = <&tlmm 67 1>; /* FUSB302_INT_N, in */
-			fusb,gpio-labels = "gpio_fusb_int_n";
-			pinctrl-names = "default", "active";
-			pinctrl-0 = <&fusb302_int_default>;
-			pinctrl-1 = <&fusb302_int_active>;
-		};
-
-		pnxxx: pnxxx@28 {
-			compatible = "nxp,pn544";
-			reg = <0x28>;
-			interrupt-parent = <&tlmm>;
-			interrupts = <13 0>;
-			gpios = <&tlmm 13 0>, /* IRQ */
-			<&tlmm 89 0>, /* VEN */
-			<&tlmm 87 0>; /* Firmware */
-
-			nxp,pnxxx-discharge-delay = <100>;
-			nxp,pnxxx-ven-inv-polarity = <0>;
-
-			pinctrl-names = "default";
-			pinctrl-0 = <&nfc_irq_default &nfc_en_default &nfc_firm_default>;
-		};
-
-		/delete-node/ adv7533@39;
-
-		usb3813@2D {
-			compatible = "microchip,usb3813";
-			reg = <0x2D>;
-			pinctrl-0 = <&hub_reset_n_default &hub_int_n_default>;
-			pinctrl-names = "default";
-			gpios = <&tlmm 74 0x20>,   /* HUB_RESET_EN */
-				<&tlmm 48 1>;   /* HUB_INT_N */
-			gpio-labels = "gpio_hub_reset_n",
-				"gpio_hub_int_n";
-			clock-names = "hub_clk";
-			clocks = <&clock_gcc clk_bb_clk2>;
-			switch-usbhost;
-			vdd-hsic-supply = <&pm8953_l23>;
-		};
-	};
-
-	i2c_3: i2c@78b7000 { /* BLSP1 QUP3 */
-		status = "okay";
-		compatible = "qcom,i2c-msm-v2";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg-names = "qup_phys_addr";
-		reg = <0x78b7000 0x600>;
-		interrupt-names = "qup_irq";
-		interrupts = <0 97 0>;
-		qcom,clk-freq-out = <400000>;
-		qcom,clk-freq-in  = <19200000>;
-		clock-names = "iface_clk", "core_clk";
-		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
-			<&clock_gcc clk_gcc_blsp1_qup3_i2c_apps_clk>;
-
-		pinctrl-names = "i2c_active", "i2c_sleep";
-		pinctrl-0 = <&i2c_3_active>;
-		pinctrl-1 = <&i2c_3_sleep>;
-		qcom,noise-rjct-scl = <0>;
-		qcom,noise-rjct-sda = <0>;
-		qcom,master-id = <86>;
-		dmas = <&dma_blsp1 8 64 0x20000020 0x20>,
-			<&dma_blsp1 9 32 0x20000020 0x20>;
-		dma-names = "tx", "rx";
-		synaptics_dsx_i2c@20 {
-			compatible = "synaptics,synaptics_dsx_i2c";
-			reg = <0x20>;
-			interrupt-parent = <&tlmm>;
-			interrupts = <65 0x2008>;
-			gpios = <&tlmm 65 0x2008>, /* IRQ */
-				<&tlmm 64 0>; /* RESET */
-			synaptics,gpio-config;
-			pinctrl-names = "default", "active";
-			pinctrl-0 = <&touch_reset_default &touch_int_default>;
-			pinctrl-1 = <&touch_reset_active &touch_int_active>;
-			config_modifier-names = "aod", "fps";
-			config_modifier-aod {
-				aod-suspended {
-					/* Power->sleep; */
-					patch-data = "S";
-				};
-			};
-			config_modifier-fps {
-				enable-notification;
-				fps-active {
-					touch-clip-area = <400 1870 700 1919 1>;
-				};
-			};
-		};
-
-	};
-
-	/* SensorHub Bus */
-	i2c_4: i2c@78b8000 {
-		/* BLSP1 QUP4, however QC refers to this address as:
-		   HWID BLSP4 - BLSP1 QUP3
-		*/
-		status = "okay";
-		compatible = "qcom,i2c-msm-v2";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg-names = "qup_phys_addr";
-		reg = <0x78b8000 0x600>;
-		interrupt-names = "qup_irq";
-		interrupts = <0 98 0>;
-		dmas = <&dma_blsp1 10 64 0x20000020 0x20>,
-			<&dma_blsp1 11 32 0x20000020 0x20>;
-		dma-names = "tx", "rx";
-		qcom,master-id = <86>;
-		qcom,clk-freq-out = <400000>;
-		qcom,clk-freq-in  = <19200000>;
-		clock-names = "iface_clk", "core_clk";
-		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
-			 <&clock_gcc clk_gcc_blsp1_qup4_i2c_apps_clk>;
-		pinctrl-names = "i2c_active", "i2c_sleep";
-		pinctrl-0 = <&i2c_4_active>;
-		pinctrl-1 = <&i2c_4_sleep>;
-
-		motosh@43 {
-			compatible = "stm,motosh";
-			reg = <0x43>;
-			gpios = <&tlmm 129 0>,  /* IRQ     CCP_AP_INT2  */
-				<&tlmm  31 0>,  /* RESET   CCP_FAULT_N  */
-				<&tlmm   8 0>,  /* BSLEN   CCP_FLASH_EN */
-				<&tlmm   9 0>,  /* WakeIRQ CCP_AP_INT   */
-				<&tlmm 128 0>,  /* SH Wake AP_CCP_WAKE  */
-				<&tlmm  12 0>;  /* SH Wake Resp CCP_AP_WAKE */
-			motosh_fw_version = "stml47x";
-			lux_table = <7 60 120 1800 4245 11350>;
-			brightness_table = <5 15 23 48 70 102 168>;
-			qd_pm_qos_latency = <350>;
-			qd_pm_qos_timeout = <500000>;
-			bslen_pin_active_value = <1>;
-			ct406_detect_threshold = <0x0096>;
-			ct406_undetect_threshold = <0x0050>;
-			ct406_recalibrate_threshold = <0x0064>;
-			ct406_pulse_count = <0x03>;
-			ct406_prox_gain = <0x02>;
-			ct406_als_lux1_c0_mult = <0x49C>; /* 1180 */
-			ct406_als_lux1_c1_mult = <0x8CC>; /* 2252 */
-			ct406_als_lux1_div = <0x80>;      /* 128 */
-			ct406_als_lux2_c0_mult = <0x129>; /* 297 */
-			ct406_als_lux2_c1_mult = <0x1E6>; /* 486 */
-			ct406_als_lux2_div = <0x80>;      /* 128 */
-			sensor1-supply = <&pm8953_l6>;
-			sensor2-supply = <&pm8953_l22>;
-			accel_orient = <3>;     /* Accel Orientation value */
-			gyro_orient = <3>;      /* Gyro Orientation value */
-			mag_orient =  <11>;     /* Mag Orientation value */
-			mag_config = <5>;       /* Magnetometer config value */
-			panel_type = <1>;       /* Panel Type value */
-			IR_config = <1>;        /* IR Config value */
-			cover_detect_polarity = <1>; /*MOTOSH_SOUTH_DETECT*/
-			pinctrl-names = "default";
-			pinctrl-0 = <&pmx_motosh_out &pmx_motosh_in>;
-			antcap_cfg = [54 21 03 00 00 0a 52 00 00 0b e7 00 00 09 9f 00 00 12 74 13 88 00 00 00 00 80 00 14 1e 00 a4 13 ec 00 00 00 00 00 de ad be ef 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ];
-			headset_detect_enable = <1>;
-			headset_insertion_debounce = <0x01F4>;
-			headset_removal_debounce = <0x0080>;
-			headset_button_down_debounce = <0x0032>;
-			headset_button_up_debounce = <0x0032>;
-			headset_button_0-1_threshold = <0x009D>;
-			headset_button_1-2_threshold = <0x0145>;
-			headset_button_2-3_threshold = <0x0201>;
-			headset_button_3-upper_threshold = <0x03B0>;
-			headset_button_1_keycode = <0xE2>; /* KEY_MEDIA */
-			headset_button_2_keycode = <0x246>;/* KEY_VOICECOMMAND */
-			headset_button_3_keycode = <0x73>; /* KEY_VOLUMEUP */
-			headset_button_4_keycode = <0x72>; /* KEY_VOLUMEDOWN */
-		};
-	};
-
-	spi_6: spi@7af6000 { /* BLSP2 QUP2 */
-		status = "ok";
-		compatible = "qcom,spi-qup-v2";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg-names = "spi_physical", "spi_bam_physical";
-		reg = <0x07af6000 0x600>,
-		<0x07ac4000 0x1f000>;
-		interrupt-names = "spi_irq", "spi_bam_irq";
-		interrupts = <0 300 0>, <0 239 0>;
-		spi-max-frequency = <19200000>;
-
-		qcom,infinite-mode = <0>;
-		qcom,use-bam;
-		qcom,ver-reg-exists;
-		qcom,bam-consumer-pipe-index = <6>;
-		qcom,bam-producer-pipe-index = <7>;
-		qcom,master-id = <84>;
-		qcom,use-pinctrl;
-		pinctrl-names = "spi_default", "spi_sleep";
-		pinctrl-0 = <&spi_6_active &spi6_cs0_active>;
-		pinctrl-1 = <&spi_6_sleep &spi6_cs0_sleep>;
-
-		clock-names = "iface_clk", "core_clk";
-
-		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
-			<&clock_gcc clk_gcc_blsp2_qup2_spi_apps_clk>;
-
-		marley: marley@0 {
-			compatible = "cirrus,cs47l35";
-			spi-max-frequency = <26000000>;
-			reg = <0x0>;
-			interrupt-parent = <&tlmm>;
-			interrupts = <46 0>;
-			interrupt-controller;
-			#interrupt-cells = <2>;
-			wlf,reset = <&tlmm 68 0>;
-			wlf,out-mono = <1 0 0 0 0 0>;
-			wlf,micbias1 = <1800 1 1 1 1 0>;
-			wlf,micbias2 = <1800 1 1 1 1 0>;
-			pinctrl-names = "default";
-			pinctrl-0 = <&marley_irq_default &marley_reset_default>;
-
-			AVDD-supply = <&pm8953_l6>;
-			DBVDD1-supply = <&pm8953_l6>;
-			DBVDD2-supply = <&pm8953_l6>;
-			CPVDD-supply = <&pm8953_l6>;
-			CPVDD1-supply = <&pm8953_l6>;
-			CPVDD2-supply = <&pm8953_l6>;
-			DCVDD-supply = <&pm8953_l6>;
-			SPKVDD-supply = <&dummy_vreg>;
-
-			gpio-controller;
-			#gpio-cells = <2>;
-
-			wlf,gpio-defaults = <
-				0x00002000 0x0000f000 /* AIF3TXDAT / GPIO1  */
-				0x00002000 0x0000f000 /* AIF3BCLK  / GPIO2  */
-				0x00000040 0x00000000 /* AIF3RXDAT / GPIO3  */
-				0x00002000 0x0000f000 /* AIF3LRCLK / GPIO4  */
-				0xffffffff 0xffffffff /* GPIO5 */
-				0xffffffff 0xffffffff /* GPIO6 */
-				0x00002000 0x0000f000 /* MIF1SDA   / GPIO7  */
-				0x00002000 0x0000f000 /* AIF1RXDAT / GPIO8  */
-				0x00002000 0x0000f000 /* AIF1BCLK  / GPIO9  */
-				0x00002000 0x0000f000 /* AIF1TXDAT / GPIO10 */
-				0x00002000 0x0000f000 /* AIF1LRCLK / GPIO11 */
-				0x00002000 0x0000f000 /* AIF2TXDAT / GPIO12 */
-				0x00002000 0x0000f000 /* AIF2BCLK  / GPIO13 */
-				0x00002000 0x0000f000 /* AIF2RXDAT / GPIO14 */
-				0x00002000 0x0000f000 /* AIF2LRCLK / GPIO15 */
-				0x00002000 0x0000f000 /* MIF1SCLK  / GPIO16 */
-			>;
-
-			adsps {
-				#address-cells = <1>;
-				#size-cells = <0>;
-				adsp@0ffe00 {
-					reg = <0x0ffe00>;
-					firmware {
-						ultrasound {
-							wlf,wmfw-file = "ultrasound";
-							wlf,bin-file = "ultrasound";
-							wlf,compr-caps = <1 1 4 1 96000>;
-						};
-					};
-				};
-				adsp@17fe00 {
-					reg = <0x17fe00>;
-					firmware {
-						frontend {
-							wlf,wmfw-file = "aov-frontend";
-							wlf,bin-file = "aov-vrgain";
-							wlf,compr-caps = <1 1 4 1 16000>;
-						};
-					};
-				};
-				adsp@1ffe00 {
-					reg = <0x1ffe00>;
-					firmware {
-						aov {
-							wlf,wmfw-file = "aov-control";
-							wlf,bin-file = "aov-model";
-							wlf,compr-caps = <1 1 4 1 16000>;
-						};
-					};
-				};
-			};
-		};
-	};
-
-	spi_8: spi@7af8000 { /* BLSP2 QUP3 */
-		compatible = "qcom,spi-qup-v2";
-		status = "ok";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		reg-names = "spi_physical";
-		reg = <0x07af8000 0x600>;
-		interrupt-names = "spi_irq";
-		interrupts = <0 302 0>;
-		spi-max-frequency = <19200000>;
-
-		pinctrl-names = "spi_default", "spi_sleep";
-		pinctrl-0 = <&spi_8_active>;
-		pinctrl-1 = <&spi_8_sleep>;
-		qcom,infinite-mode = <0>;
-		qcom,master-id = <84>;
-		qcom,use-pinctrl;
-
-		fpc_fpc1020@0{
-			compatible = "fpc,fpc1020";
-			status = "ok";
-			reg = <0>;
-			interrupts = <42 0x0>;
-			spi-max-frequency = <4800000>;
-			fpc,gpio_irq = <&tlmm 42 0>;
-			fpc,gpio_rst = <&tlmm 47 0>;
-			fpc,txout_boost_enable;
-			vcc_spi-supply = <&pm8953_s3>;
-			vcc_ana-supply = <&pm8953_l6>;
-			vcc_io-supply  = <&pm8953_l6>;
-			clock-names = "iface_clk", "core_clk";
-			clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
-			<&clock_gcc clk_gcc_blsp2_qup4_spi_apps_clk>;
-		};
-	};
-
 	/* currus 1.2V supply TPS6267001 */
 	cdc_1p2v: cdc_1p2v {
 		status = "disabled";
@@ -488,8 +117,8 @@
 		qcom,rts-gpio = <&tlmm 19 1>;
 		qcom,master-id = <84>;
 		clock-names = "core_clk", "iface_clk";
-		clocks = <&clock_gcc clk_gcc_blsp2_uart1_apps_clk>,
-			<&clock_gcc clk_gcc_blsp2_ahb_clk>;
+		clocks = <&gcc GCC_BLSP2_UART1_APPS_CLK>,
+			<&gcc GCC_BLSP2_AHB_CLK>;
 		qcom,bam-tx-ep-pipe-index = <0>;
 		qcom,bam-rx-ep-pipe-index = <1>;
 		qcom,msm-bus,name = "blsp2_uart1";
@@ -591,7 +220,7 @@
 		compatible = "mmi,apba-ctrl";
 		reg = <0 0>;
 		clock-names = "apba_mclk";
-		clocks = <&clock_gcc clk_bb_clk2>;
+		clocks = <&rpmcc RPM_SMD_BB_CLK2>;
 		pinctrl-names = "default", "spi_active";
 		pinctrl-0 = <&apba_default &spi1_cs1_sleep>;
 		pinctrl-1 = <&apba_default &spi1_cs1_active>;
@@ -641,19 +270,6 @@
 
 	mods_codec_shim {
 		compatible = "mmi,mods-codec-shim";
-	};
-
-	usb3: ssusb@7000000{
-		mmi,qos_latency = <10999>;
-		vbus_dwc3-supply = <&usb_otg_switch>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&otg_en_default &otg_fault_default>;
-		qcom,otg-fault-gpio = <&tlmm 34  0x1>; /* GPIOF_IN*/
-		psy,type-c;
-		qcom,ssusb-compliance;
-		dwc3@7000000 {
-			controller-number = /bits/ 8 <1>;
-		};
 	};
 
 	sound {
@@ -836,8 +452,293 @@
 					"back_temp";
 		status = "ok";
 	};
+
+
 };
 
+	&spi_8 { /* BLSP2 QUP3 */
+		status = "ok";
+
+		fpc_fpc1020@0{
+			compatible = "fpc,fpc1020";
+			status = "ok";
+			reg = <0>;
+			interrupts = <42 0x0>;
+			spi-max-frequency = <4800000>;
+			fpc,gpio_irq = <&tlmm 42 0>;
+			fpc,gpio_rst = <&tlmm 47 0>;
+			fpc,txout_boost_enable;
+			vcc_spi-supply = <&pm8953_s3>;
+			vcc_ana-supply = <&pm8953_l6>;
+			vcc_io-supply  = <&pm8953_l6>;
+		};
+	};
+	
+	
+	
+	&i2c_2 { 
+		status = "okay";
+		cs35l34@40 {
+			compatible = "cirrus,cs35l34";
+			reg = <0x40>;
+
+			cirrus,gain-zc = <1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&cs35l34_reset_default>;
+		};
+
+		stmvl53l0@29 {
+			compatible = "st,stmvl53l0_i2c";
+			reg = <0x29>;
+			vdd-supply = <&pm8950_l22>;
+			gpios = <&tlmm 86 0>, <&tlmm 43 0>;
+			qcom,gpio-reset = <0>;
+			qcom,gpio-req-tbl-num = <0 1>;
+			qcom,gpio-req-tbl-flags = <0 1>;
+			qcom,gpio-req-tbl-label ="TOF_XSHUTDOWN","TOF_INT";
+			pinctrl-names = "laser_default", "laser_suspend";
+			pinctrl-0 = <&laser_active >;
+			pinctrl-1 = <&laser_suspend >;
+			st,sensorthreshold = <60 65>;
+			st,xtalkval = <19>;
+		};
+
+		fusb302@22 {
+			compatible = "fairchild,fusb302";
+			reg = <0x22>;
+			gpios = <&tlmm 67 1>; /* FUSB302_INT_N, in */
+			fusb,gpio-labels = "gpio_fusb_int_n";
+			pinctrl-names = "default", "active";
+			pinctrl-0 = <&fusb302_int_default>;
+			pinctrl-1 = <&fusb302_int_active>;
+		};
+
+		pnxxx: pnxxx@28 {
+			compatible = "nxp,pn544";
+			reg = <0x28>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <13 0>;
+			gpios = <&tlmm 13 0>, /* IRQ */
+			<&tlmm 89 0>, /* VEN */
+			<&tlmm 87 0>; /* Firmware */
+
+			nxp,pnxxx-discharge-delay = <100>;
+			nxp,pnxxx-ven-inv-polarity = <0>;
+
+			pinctrl-names = "default";
+			pinctrl-0 = <&nfc_irq_default &nfc_en_default &nfc_firm_default>;
+		};
+
+		/delete-node/ adv7533@39;
+
+		usb3813@2D {
+			compatible = "microchip,usb3813";
+			reg = <0x2D>;
+			pinctrl-0 = <&hub_reset_n_default &hub_int_n_default>;
+			pinctrl-names = "default";
+			gpios = <&tlmm 74 0x20>,   /* HUB_RESET_EN */
+				<&tlmm 48 1>;   /* HUB_INT_N */
+			gpio-labels = "gpio_hub_reset_n",
+				"gpio_hub_int_n";
+			clock-names = "hub_clk";
+			clocks = <&rpmcc RPM_SMD_BB_CLK2>;
+			switch-usbhost;
+			vdd-hsic-supply = <&pm8953_l23>;
+		};
+	};
+
+	&i2c_3 {
+		status = "okay";
+		
+		synaptics_dsx_i2c@20 {
+			compatible = "synaptics,synaptics_dsx_i2c";
+			reg = <0x20>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <65 0x2008>;
+			gpios = <&tlmm 65 0x2008>, /* IRQ */
+				<&tlmm 64 0>; /* RESET */
+			synaptics,gpio-config;
+			pinctrl-names = "default", "active";
+			pinctrl-0 = <&touch_reset_default &touch_int_default>;
+			pinctrl-1 = <&touch_reset_active &touch_int_active>;
+			config_modifier-names = "aod", "fps";
+			config_modifier-aod {
+				aod-suspended {
+					/* Power->sleep; */
+					patch-data = "S";
+				};
+			};
+			config_modifier-fps {
+				enable-notification;
+				fps-active {
+					touch-clip-area = <400 1870 700 1919 1>;
+				};
+			};
+		};
+
+	};
+
+	/* SensorHub Bus */
+	&i2c_4 {
+		/* BLSP1 QUP4, however QC refers to this address as:
+		   HWID BLSP4 - BLSP1 QUP3
+		*/
+		status = "okay";
+		
+		motosh@43 {
+			compatible = "stm,motosh";
+			reg = <0x43>;
+			gpios = <&tlmm 129 0>,  /* IRQ     CCP_AP_INT2  */
+				<&tlmm  31 0>,  /* RESET   CCP_FAULT_N  */
+				<&tlmm   8 0>,  /* BSLEN   CCP_FLASH_EN */
+				<&tlmm   9 0>,  /* WakeIRQ CCP_AP_INT   */
+				<&tlmm 128 0>,  /* SH Wake AP_CCP_WAKE  */
+				<&tlmm  12 0>;  /* SH Wake Resp CCP_AP_WAKE */
+			motosh_fw_version = "stml47x";
+			lux_table = <7 60 120 1800 4245 11350>;
+			brightness_table = <5 15 23 48 70 102 168>;
+			qd_pm_qos_latency = <350>;
+			qd_pm_qos_timeout = <500000>;
+			bslen_pin_active_value = <1>;
+			ct406_detect_threshold = <0x0096>;
+			ct406_undetect_threshold = <0x0050>;
+			ct406_recalibrate_threshold = <0x0064>;
+			ct406_pulse_count = <0x03>;
+			ct406_prox_gain = <0x02>;
+			ct406_als_lux1_c0_mult = <0x49C>; /* 1180 */
+			ct406_als_lux1_c1_mult = <0x8CC>; /* 2252 */
+			ct406_als_lux1_div = <0x80>;      /* 128 */
+			ct406_als_lux2_c0_mult = <0x129>; /* 297 */
+			ct406_als_lux2_c1_mult = <0x1E6>; /* 486 */
+			ct406_als_lux2_div = <0x80>;      /* 128 */
+			sensor1-supply = <&pm8953_l6>;
+			sensor2-supply = <&pm8953_l22>;
+			accel_orient = <3>;     /* Accel Orientation value */
+			gyro_orient = <3>;      /* Gyro Orientation value */
+			mag_orient =  <11>;     /* Mag Orientation value */
+			mag_config = <5>;       /* Magnetometer config value */
+			panel_type = <1>;       /* Panel Type value */
+			IR_config = <1>;        /* IR Config value */
+			cover_detect_polarity = <1>; /*MOTOSH_SOUTH_DETECT*/
+			pinctrl-names = "default";
+			pinctrl-0 = <&pmx_motosh_out &pmx_motosh_in>;
+			antcap_cfg = [54 21 03 00 00 0a 52 00 00 0b e7 00 00 09 9f 00 00 12 74 13 88 00 00 00 00 80 00 14 1e 00 a4 13 ec 00 00 00 00 00 de ad be ef 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ];
+			headset_detect_enable = <1>;
+			headset_insertion_debounce = <0x01F4>;
+			headset_removal_debounce = <0x0080>;
+			headset_button_down_debounce = <0x0032>;
+			headset_button_up_debounce = <0x0032>;
+			headset_button_0-1_threshold = <0x009D>;
+			headset_button_1-2_threshold = <0x0145>;
+			headset_button_2-3_threshold = <0x0201>;
+			headset_button_3-upper_threshold = <0x03B0>;
+			headset_button_1_keycode = <0xE2>; /* KEY_MEDIA */
+			headset_button_2_keycode = <0x246>;/* KEY_VOICECOMMAND */
+			headset_button_3_keycode = <0x73>; /* KEY_VOLUMEUP */
+			headset_button_4_keycode = <0x72>; /* KEY_VOLUMEDOWN */
+		};
+	};
+
+	&spi_6 { /* BLSP2 QUP2 */
+		status = "ok";
+		
+		marley: marley@0 {
+			compatible = "cirrus,cs47l35";
+			spi-max-frequency = <26000000>;
+			reg = <0x0>;
+			interrupt-parent = <&tlmm>;
+			interrupts = <46 0>;
+			interrupt-controller;
+			#interrupt-cells = <2>;
+			wlf,reset = <&tlmm 68 0>;
+			wlf,out-mono = <1 0 0 0 0 0>;
+			wlf,micbias1 = <1800 1 1 1 1 0>;
+			wlf,micbias2 = <1800 1 1 1 1 0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&marley_irq_default &marley_reset_default>;
+
+			AVDD-supply = <&pm8953_l6>;
+			DBVDD1-supply = <&pm8953_l6>;
+			DBVDD2-supply = <&pm8953_l6>;
+			CPVDD-supply = <&pm8953_l6>;
+			CPVDD1-supply = <&pm8953_l6>;
+			CPVDD2-supply = <&pm8953_l6>;
+			DCVDD-supply = <&pm8953_l6>;
+			SPKVDD-supply = <&dummy_vreg>;
+
+			gpio-controller;
+			#gpio-cells = <2>;
+
+			wlf,gpio-defaults = <
+				0x00002000 0x0000f000 /* AIF3TXDAT / GPIO1  */
+				0x00002000 0x0000f000 /* AIF3BCLK  / GPIO2  */
+				0x00000040 0x00000000 /* AIF3RXDAT / GPIO3  */
+				0x00002000 0x0000f000 /* AIF3LRCLK / GPIO4  */
+				0xffffffff 0xffffffff /* GPIO5 */
+				0xffffffff 0xffffffff /* GPIO6 */
+				0x00002000 0x0000f000 /* MIF1SDA   / GPIO7  */
+				0x00002000 0x0000f000 /* AIF1RXDAT / GPIO8  */
+				0x00002000 0x0000f000 /* AIF1BCLK  / GPIO9  */
+				0x00002000 0x0000f000 /* AIF1TXDAT / GPIO10 */
+				0x00002000 0x0000f000 /* AIF1LRCLK / GPIO11 */
+				0x00002000 0x0000f000 /* AIF2TXDAT / GPIO12 */
+				0x00002000 0x0000f000 /* AIF2BCLK  / GPIO13 */
+				0x00002000 0x0000f000 /* AIF2RXDAT / GPIO14 */
+				0x00002000 0x0000f000 /* AIF2LRCLK / GPIO15 */
+				0x00002000 0x0000f000 /* MIF1SCLK  / GPIO16 */
+			>;
+
+			adsps {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				adsp@0ffe00 {
+					reg = <0x0ffe00>;
+					firmware {
+						ultrasound {
+							wlf,wmfw-file = "ultrasound";
+							wlf,bin-file = "ultrasound";
+							wlf,compr-caps = <1 1 4 1 96000>;
+						};
+					};
+				};
+				adsp@17fe00 {
+					reg = <0x17fe00>;
+					firmware {
+						frontend {
+							wlf,wmfw-file = "aov-frontend";
+							wlf,bin-file = "aov-vrgain";
+							wlf,compr-caps = <1 1 4 1 16000>;
+						};
+					};
+				};
+				adsp@1ffe00 {
+					reg = <0x1ffe00>;
+					firmware {
+						aov {
+							wlf,wmfw-file = "aov-control";
+							wlf,bin-file = "aov-model";
+							wlf,compr-caps = <1 1 4 1 16000>;
+						};
+					};
+				};
+			};
+		};
+	};
+	
+&usb3 {
+		mmi,qos_latency = <10999>;
+		vbus_dwc3-supply = <&usb_otg_switch>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&otg_en_default &otg_fault_default>;
+		qcom,otg-fault-gpio = <&tlmm 34  0x1>; /* GPIOF_IN*/
+		psy,type-c;
+		qcom,ssusb-compliance;
+		dwc3@7000000 {
+			controller-number = /bits/ 8 <1>;
+		};
+	};
+	
+	
 &spi_1 { /* BLSP1 QUP1 */
 	status = "ok";
 	compatible = "qcom,spi-qup-v2", "moto,mod-spi-transfer";
@@ -861,8 +762,8 @@
 
 	clock-names = "iface_clk", "core_clk";
 
-	clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
-		<&clock_gcc clk_gcc_blsp1_qup1_spi_apps_clk>;
+	clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+		 <&gcc GCC_BLSP1_QUP1_I2C_APPS_CLK>;
 
 
 	muc_spi: muc_spi@0 {
@@ -913,8 +814,8 @@
 	qcom,clk-freq-out = <400000>;
 	qcom,clk-freq-in  = <19200000>;
 	clock-names = "iface_clk", "core_clk";
-	clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
-		 <&clock_gcc clk_gcc_blsp1_qup1_i2c_apps_clk>;
+	clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+		 <&gcc GCC_BLSP1_QUP1_I2C_APPS_CLK>;
 
 	muc_i2c@42 {
 		compatible = "moto,muc_i2c";
@@ -1124,7 +1025,7 @@
 	};
 };
 
-&pmi8950_charger {
+&qpnp_smbcharger {
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&factory_default>;
@@ -1203,7 +1104,7 @@
 	};
 };
 
-&pmi8950_fg {
+&qpnp_fg {
 	status = "okay";
 	qcom,warm-bat-decidegc = <450>;
 	qcom,cool-bat-decidegc = <0>;

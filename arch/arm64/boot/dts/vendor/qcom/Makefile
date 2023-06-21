@@ -505,6 +505,46 @@ dtb-$(CONFIG_ARCH_MSM8953) += msm8953-cdp.dtb \
 	msm8953-pmi8940-ext-codec-mtp.dtb \
 	msm8953-pmi8937-ext-codec-mtp.dtb 
 	
+dtb-$(CONFIG_ADDISON_DTB) += msm8953-addison-p1.dtb \
+	msm8953-addison-p2a.dtb \
+	msm8953-addison-p3.dtb \
+	msm8953-addison-p4.dtb \
+	msm8953-addison-p7.dtb
+
+dtb-$(CONFIG_POTTER_DTB) += msm8953-potter-p0a.dtb \
+	msm8953-potter-p1a.dtb \
+	msm8953-potter-p1b.dtb \
+	msm8953-potter-p2a.dtb \
+	msm8953-potter-p2a2.dtb \
+	msm8953-potter-p2b.dtb \
+	msm8953-potter-p3a.dtb
+
+dtb-$(CONFIG_ALBUS_DTB) += msm8953-albus-p0.dtb \
+	msm8953-albus-p1.dtb \
+	msm8953-albus-p1a1.dtb \
+	msm8953-albus-p1b.dtb \
+	msm8953-albus-p2.dtb \
+	msm8953-albus-p3.dtb \
+	msm8953-albus-p4.dtb
+
+dtb-$(CONFIG_JOHNSON_DTB) += msm8953-johnson-p0.dtb \
+	msm8953-johnson-p0b.dtb \
+	sdm450-johnson-evb3.dtb \
+	sdm450-johnson-evt1.dtb
+
+dtb-$(CONFIG_DEEN_DTB) += msm8953-deen-evt1.dtb \
+	msm8953-deen-evt2.dtb \
+	msm8953-deen-dvt1a.dtb \
+	msm8953-deen-dvt1b.dtb \
+	msm8953-deen-dvt2.dtb \
+	msm8953-deen-pvt1.dtb \
+	msm8953-deen-pvt2.dtb
+
+dtb-$(CONFIG_SANDERS_DTB) += msm8953-sanders-p1.dtb \
+	msm8953-sanders-p2.dtb \
+	msm8953-sanders-p3.dtb \
+	msm8953-sanders-p4.dtb
+
 dtb-$(CONFIG_ARCH_SDM439) += sdm439-mtp.dtb \
 	sdm439-cdp.dtb \
 	sdm439-qrd.dtb \
