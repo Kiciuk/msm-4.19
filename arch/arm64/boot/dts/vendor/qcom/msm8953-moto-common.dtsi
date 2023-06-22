@@ -27,7 +27,6 @@
 		spi1 = &spi_1;
 		spi6 = &spi_6;
 		spi8 = &spi_8;
-		uart5 = &blsp2_uart1;
 		/delete-property/ spi3;
 		/delete-property/ i2c5;
 	};
@@ -68,8 +67,7 @@
 };
 
 &soc{
-	/delete-node/ uart@78b0000;
-	/delete-node/ uart@7aef000;
+
 	/delete-node/ i2c@7af5000;
 	/delete-node/ spi@78b7000;
 	/delete-node/ adv_vreg;
@@ -95,41 +93,6 @@
 		gpio = <&tlmm 126 0>;
 	};
 
-	blsp2_uart1: uart@7aef000 { /* BLSP2 UART1 */
-		compatible = "qcom,msm-hsuart-v14";
-		reg = <0x7aef000 0x200>,
-			<0x7ac4000 0x1f000>;
-		reg-names = "core_mem", "bam_mem";
-
-		interrupt-names = "core_irq", "bam_irq", "wakeup_irq";
-		#address-cells = <0>;
-		interrupt-parent = <&blsp2_uart1>;
-		interrupts = <0 1 2>;
-		#interrupt-cells = <1>;
-		interrupt-map-mask = <0xffffffff>;
-		interrupt-map = <0 &intc 0 306 0
-				1 &intc 0 239 0
-				2 &tlmm 17 0>;
-
-		qcom,tx-gpio = <&tlmm 16 0>;
-		qcom,rx-gpio = <&tlmm 17 1>;
-		qcom,cts-gpio = <&tlmm 18 0>;
-		qcom,rts-gpio = <&tlmm 19 1>;
-		qcom,master-id = <84>;
-		clock-names = "core_clk", "iface_clk";
-		clocks = <&gcc GCC_BLSP2_UART1_APPS_CLK>,
-			<&gcc GCC_BLSP2_AHB_CLK>;
-		qcom,bam-tx-ep-pipe-index = <0>;
-		qcom,bam-rx-ep-pipe-index = <1>;
-		qcom,msm-bus,name = "blsp2_uart1";
-		qcom,msm-bus,num-cases = <2>;
-		qcom,msm-bus,num-paths = <1>;
-		qcom,msm-bus,vectors-KBps =
-				<84 512 0 0>,
-				<84 512 500 800>;
-		status = "ok";
-	};
-
 	mod_uart {
 		compatible = "mmi,mod-uart";
 		mmi,tty = "ttyHS5";
@@ -137,8 +100,8 @@
 		mmi,intf-id = /bits/ 8 <5>;
 
 		pinctrl-names = "default", "active";
-		pinctrl-0 = <&blsp2_uart1_sleep>;
-		pinctrl-1 = <&blsp2_uart1_active>;
+		pinctrl-0 = <&blsp2_uart0_sleep>;
+		pinctrl-1 = <&blsp2_uart0_active>;
 	};
 
 	muc: muc {
@@ -280,14 +243,14 @@
 		/* qcom,marley-mclk-clk-freq = <9600000>; */
 		asoc-platform = <&pcm0>, <&pcm1>, <&pcm2>, <&voip>, <&voice>,
 			<&loopback>, <&compress>, <&hostless>,
-			<&afe>, <&lsm>, <&routing>, <&cpe>, <&lpa>, <&marley>;
+			<&afe>, <&lsm>, <&routing>, <&cpe>,  <&marley>;
 		asoc-platform-names = "msm-pcm-dsp.0", "msm-pcm-dsp.1",
 			"msm-pcm-dsp.2", "msm-voip-dsp",
 			"msm-pcm-voice", "msm-pcm-loopback",
 			"msm-compress-dsp", "msm-pcm-hostless",
 			"msm-pcm-afe", "msm-lsm-client",
 			"msm-pcm-routing", "msm-cpe-lsm",
-			"msm-pcm-lpa", "marley-codec";
+			"marley-codec";
 		asoc-cpu = <&dai_pri_auxpcm>, <&dai_mi2s3>, <&dai_mi2s5>,
 			<&sb_0_rx>, <&sb_0_tx>, <&sb_1_rx>, <&sb_1_tx>,
 			<&sb_2_rx>, <&sb_2_tx>, <&sb_3_rx>, <&sb_3_tx>,
@@ -331,7 +294,7 @@
 			pinctrl-0 = <&sec_tlmm_lines_act>;
 			pinctrl-1 = <&sec_tlmm_lines_sus>;
 		};
-		dai_mi2s5: qcom,msm-dai-q6-mi2s-quin {
+		dai_mi2s4: qcom,msm-dai-q6-mi2s-quin {
 			qcom,msm-mi2s-rx-lines = <2>;
 			pinctrl-names = "default", "idle";
 			pinctrl-0 = <&pri_tlmm_lines_act>, <&pri_tlmm_ws_act>;
@@ -456,6 +419,7 @@
 
 };
 
+	
 	&spi_8 { /* BLSP2 QUP3 */
 		status = "ok";
 
@@ -1196,3 +1160,15 @@
 		};
 	};
 };
+
+&blsp2_uart0 { 
+	 	/delete-property/  qcom,inject-rx-on-wakeup;
+	 	/delete-property/   qcom,rx-char-to-inject;
+	 	
+		qcom,tx-gpio = <&tlmm 16 0>;
+		qcom,rx-gpio = <&tlmm 17 1>;
+		qcom,cts-gpio = <&tlmm 18 0>;
+		qcom,rts-gpio = <&tlmm 19 1>;
+
+		status = "okay";
+	};

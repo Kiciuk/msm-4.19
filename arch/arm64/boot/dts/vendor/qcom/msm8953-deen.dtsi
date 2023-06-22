@@ -381,14 +381,13 @@
 
 		asoc-platform = <&pcm0>, <&pcm1>, <&pcm2>, <&voip>, <&voice>,
 			<&loopback>, <&compress>, <&hostless>,
-			<&afe>, <&lsm>, <&routing>, <&cpe>, <&lpa>;
+			<&afe>, <&lsm>, <&routing>, <&cpe>;
 		asoc-platform-names = "msm-pcm-dsp.0", "msm-pcm-dsp.1",
 			"msm-pcm-dsp.2", "msm-voip-dsp",
 			"msm-pcm-voice", "msm-pcm-loopback",
 			"msm-compress-dsp", "msm-pcm-hostless",
 			"msm-pcm-afe", "msm-lsm-client",
-			"msm-pcm-routing", "msm-cpe-lsm",
-			"msm-pcm-lpa";
+			"msm-pcm-routing", "msm-cpe-lsm";
 
 		asoc-cpu = <&dai_pri_auxpcm>,
 				<&dai_mi2s0>, <&dai_mi2s1>,
@@ -442,14 +441,14 @@
 			status = "okay";
 		};
 
-		dai_mi2s5: qcom,msm-dai-q6-mi2s-quin {
+		dai_mi2s4: qcom,msm-dai-q6-mi2s-quin {
 			status = "okay";
 			/delete-property/ pinctrl-names;
 			/delete-property/ pinctrl-0;
 			/delete-property/ pinctrl-1;
 		};
 
-		dai_mi2s6: qcom,msm-dai-q6-mi2s-senary {
+		dai_mi2s5: qcom,msm-dai-q6-mi2s-senary {
 			status = "okay";
 		};
 	};
