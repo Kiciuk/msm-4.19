@@ -5,11 +5,13 @@
 #include <linux/clk-provider.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/platform_device.h>
 #include <linux/of_device.h>
 #include <linux/of.h>
 #include <linux/regmap.h>
+#include <linux/reset-controller.h>
 #include <linux/nvmem-consumer.h>
-
+#include <linux/slab.h>
 #include <dt-bindings/clock/qcom,gcc-msm8953.h>
 
 #include "clk-alpha-pll.h"
@@ -1320,6 +1322,27 @@ static const char * const gcc_gfx3d_names[] = {
 	"gpll4",
 	"gpll0_out_aux",
 	"gpll6_out_main_div",
+};
+
+/* GFX clock init data */
+static struct clk_init_data gpu_clks_init[] = {
+	[0] = {
+		.name = "gfx3d_clk_src",
+		.parent_names = gcc_gfx3d_names,
+		.num_parents = ARRAY_SIZE(gcc_gfx3d_names),
+		.ops = &clk_gfx3d_src_ops,
+		.flags = CLK_SET_RATE_PARENT | CLK_OPS_PARENT_ENABLE,
+	},
+	[1] = {
+		.name = "gcc_oxili_gfx3d_clk",
+		.parent_names = (const char *[]){
+			"gfx3d_clk_src",
+		},
+		.num_parents = 1,
+		.ops = &clk_branch2_ops,
+		.flags = CLK_SET_RATE_PARENT,
+		.vdd_class = &vdd_gfx,
+	},
 };
 
 static const struct freq_tbl ftbl_gfx3d_clk_src[] = {
@@ -4492,6 +4515,64 @@ static const struct of_device_id gcc_msm8953_match_table[] = {
 	{},
 };
 
+static int of_get_fmax_vdd_class(struct platform_device *pdev,
+		struct clk_hw *hw, char *prop_name, u32 index)
+{
+	struct device_node *of = pdev->dev.of_node;
+	int prop_len, i, j;
+	struct clk_vdd_class *vdd = hw->init->vdd_class;
+	int num = vdd->num_regulators + 1;
+	u32 *array;
+
+	if (!of_find_property(of, prop_name, &prop_len)) {
+		dev_err(&pdev->dev, "missing %s\n", prop_name);
+		return -EINVAL;
+	}
+
+	prop_len /= sizeof(u32);
+	if (prop_len % num) {
+		dev_err(&pdev->dev, "bad length %d\n", prop_len);
+		return -EINVAL;
+	}
+
+	prop_len /= num;
+	vdd->level_votes = devm_kzalloc(&pdev->dev, prop_len * sizeof(int),
+					GFP_KERNEL);
+	if (!vdd->level_votes)
+		return -ENOMEM;
+
+	vdd->vdd_uv = devm_kzalloc(&pdev->dev,
+			prop_len * sizeof(int) * (num - 1), GFP_KERNEL);
+	if (!vdd->vdd_uv)
+		return -ENOMEM;
+
+	gpu_clks_init[index].rate_max = devm_kzalloc(&pdev->dev, prop_len *
+					sizeof(unsigned long), GFP_KERNEL);
+	if (!gpu_clks_init[index].rate_max)
+		return -ENOMEM;
+
+	array = kzalloc(prop_len * sizeof(u32) * num,
+				GFP_KERNEL);
+	if (!array)
+		return -ENOMEM;
+
+	of_property_read_u32_array(of, prop_name, array, prop_len * num);
+	for (i = 0; i < prop_len; i++) {
+		gpu_clks_init[index].rate_max[i] = array[num * i];
+		for (j = 1; j < num; j++) {
+			vdd->vdd_uv[(num - 1) * i + (j - 1)] =
+						array[num * i + j];
+		}
+	}
+
+	kfree(array);
+	vdd->num_levels = prop_len;
+	vdd->cur_level = prop_len;
+	gpu_clks_init[index].num_rate_max = prop_len;
+
+	return 0;
+}
+
 static int gcc_msm8953_probe(struct platform_device *pdev)
 {
 	int i, ret;
@@ -4529,8 +4610,8 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
 	}
 
         /* GFX rail fmax data linked to branch clock */
-	of_get_fmax_vdd_class(pdev, &gpucc_gfx3d_clk.clkr.hw,
-						"qcom,gfxfreq-corner", 1);
+	ret = of_get_fmax_vdd_class(pdev, &gcc_oxili_gfx3d_clk.clkr.hw,
+					"qcom,gfxfreq-corner", 1);
 
 	ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
 	if (ret) {
