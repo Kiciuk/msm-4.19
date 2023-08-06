@@ -336,6 +336,9 @@
 #define PM660_FAB_ID_TSMC	0x2
 #define PM660_FAB_ID_MX		0x3
 
+/* PM8953 */
+#define PM8953_SUBTYPE		0x16
+
 /* PM8005 */
 #define PM8005_SUBTYPE		0x18
 
