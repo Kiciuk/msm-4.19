@@ -765,12 +765,34 @@ static int msm_gfx_ldo_is_enabled(struct regulator_dev *rdev)
 	return ldo_vreg->vreg_enabled;
 }
 
+/**
+ * msm_gfx_ldo_list_corner_voltage() - return the ldo voltage mapped to
+ *			the specified voltage corner
+ * @rdev:		Regulator device pointer for the msm_gfx_ldo
+ * @corner:		Voltage corner
+ *
+ * Return: voltage value in microvolts or -EINVAL if the corner is out of range
+ */
+static int msm_gfx_ldo_list_corner_voltage(struct regulator_dev *rdev,
+		int corner)
+{
+	struct msm_gfx_ldo *ldo_vreg  = rdev_get_drvdata(rdev);
+
+	corner -= MIN_CORNER_OFFSET;
+
+	if (corner >= 0 && corner < ldo_vreg->num_corners)
+		return ldo_vreg->open_loop_volt[corner];
+	else
+		return -EINVAL;
+}
+
 static struct regulator_ops msm_gfx_ldo_corner_ops = {
 	.enable		= msm_gfx_ldo_corner_enable,
 	.disable	= msm_gfx_ldo_disable,
 	.is_enabled	= msm_gfx_ldo_is_enabled,
 	.set_voltage	= msm_gfx_ldo_set_corner,
 	.get_voltage	= msm_gfx_ldo_get_corner,
+	.list_corner_voltage	= msm_gfx_ldo_list_corner_voltage,
 };
 
 static int msm_gfx_ldo_get_bypass(struct regulator_dev *rdev,
@@ -1067,6 +1089,8 @@ static int msm_gfx_ldo_mem_acc_init(struct msm_gfx_ldo *ldo_vreg)
 			if (rc != -EPROBE_DEFER)
 				pr_err("devm_regulator_get: mem-acc: rc=%d\n",
 					rc);
+			    if (rc == -EPROBE_DEFER)
+                        pr_err("searching for mem-acc:\n");
 			return rc;
 		}
 	} else {
@@ -1157,6 +1181,8 @@ static int ldo_parse_cx_parameters(struct msm_gfx_ldo *ldo_vreg)
 			if (rc != -EPROBE_DEFER)
 				pr_err("devm_regulator_get: vdd-cx: rc=%d\n",
 					rc);
+			if (rc == -EPROBE_DEFER)
+                        pr_err("searching for vdd-cx:\n");
 			return rc;
 		}
 	} else {
