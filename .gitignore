@@ -94,8 +94,6 @@ include/generated
 include/ksym
 arch/*/include/generated
 
-# stgit generated dirs
-patches-*
 
 # quilt's files
 patches
@@ -135,9 +133,6 @@ all.config
 
 # fetched Android config fragments
 kernel/configs/android-*.cfg
-
-# vendor device tree directories
-arch/arm64/boot/dts/vendor/
 
 # Tech package directories
 techpack/
