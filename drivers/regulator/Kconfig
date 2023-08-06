@@ -1087,6 +1087,20 @@ config REGULATOR_CPR3
 	  rails, the CPR3 controller is able to propagate the voltage increase
 	  or decrease requests all the way to the PMIC without software
 	  involvement.
+	  
+config REGULATOR_CPR4_APSS
+	bool "CPR4 regulator for APSS"
+	depends on OF
+	select REGULATOR_CPR3
+	help
+	  This driver supports Qualcomm Technologies, Inc. APSS application
+	  processor specific features including memory array power mux (APM)
+	  switching, one CPR4 thread which monitor the two APSS clusters that
+	  are both powered by a shared supply, hardware closed-loop auto
+	  voltage stepping, voltage adjustments based on online core count,
+	  voltage adjustments based on temperature readings, and voltage
+	  adjustments for performance boost mode. This driver reads both initial
+	  voltage and CPR target quotient values out of hardware fuses.
 
 config REGULATOR_CPR4_MMSS_LDO
 	bool "RBCPR3 regulator for MMSS LDO"
