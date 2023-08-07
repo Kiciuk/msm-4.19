@@ -555,7 +555,7 @@ static void __init mm_init(void)
 	/* Should be run after espfix64 is set up. */
 	pti_init();
 }
-
+void __init ramoops_earlycon_setup(u32 phys, u32 size);
 asmlinkage __visible void __init start_kernel(void)
 {
 	char *command_line;
@@ -609,7 +609,7 @@ asmlinkage __visible void __init start_kernel(void)
 	sort_main_extable();
 	trap_init();
 	mm_init();
-
+        ramoops_earlycon_setup(0x9ff00000, 0xbf800);
 	ftrace_init();
 
 	/* trace_printk can be enabled here */
