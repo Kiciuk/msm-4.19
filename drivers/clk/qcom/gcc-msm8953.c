@@ -5,13 +5,10 @@
 #include <linux/clk-provider.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/platform_device.h>
 #include <linux/of_device.h>
 #include <linux/of.h>
 #include <linux/regmap.h>
-#include <linux/reset-controller.h>
 #include <linux/nvmem-consumer.h>
-#include <linux/slab.h>
 #include <dt-bindings/clock/qcom,gcc-msm8953.h>
 
 #include "clk-alpha-pll.h"
@@ -25,7 +22,6 @@
 
 #define F_SLEW(f, s, h, m, n, sf) { (f), (s), (2 * (h) - 1), (m), (n), (sf) }
 
-static DEFINE_VDD_REGS_INIT(vdd_gfx, 1);
 static DEFINE_VDD_REGULATORS(vdd_cx, VDD_NUM, 1, vdd_corner);
 
 enum {
@@ -44,9 +40,13 @@ enum {
 	P_DSI1PLL_BYTE,
 	P_GPLL3_OUT_MAIN_DIV
 };
+static unsigned int soft_vote_gpll0;
 
 static struct clk_alpha_pll gpll0_out_main = {
 	.offset = 0x21000,
+	.soft_vote = &soft_vote_gpll0,
+	.soft_vote_mask = PLL_SOFT_VOTE_PRIMARY,
+	.flags = SUPPORTS_FSM_MODE,
 	.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
 	.clkr = {
 		.enable_reg = 0x45000,
@@ -58,10 +58,6 @@ static struct clk_alpha_pll gpll0_out_main = {
 			},
 			.num_parents = 1,
 			.ops = &clk_alpha_pll_ops,
-			.vdd_class = &vdd_cx,
-			.num_rate_max = VDD_NUM,
-			.rate_max = (unsigned long[VDD_NUM]) {
-				[VDD_NOMINAL] = 1400000000},
 		    },
 		},
 };
@@ -1324,27 +1320,6 @@ static const char * const gcc_gfx3d_names[] = {
 	"gpll6_out_main_div",
 };
 
-/* GFX clock init data */
-static struct clk_init_data gpu_clks_init[] = {
-	[0] = {
-		.name = "gfx3d_clk_src",
-		.parent_names = gcc_gfx3d_names,
-		.num_parents = ARRAY_SIZE(gcc_gfx3d_names),
-		.ops = &clk_gfx3d_src_ops,
-		.flags = CLK_SET_RATE_PARENT | CLK_OPS_PARENT_ENABLE,
-	},
-	[1] = {
-		.name = "gcc_oxili_gfx3d_clk",
-		.parent_names = (const char *[]){
-			"gfx3d_clk_src",
-		},
-		.num_parents = 1,
-		.ops = &clk_branch2_ops,
-		.flags = CLK_SET_RATE_PARENT,
-		.vdd_class = &vdd_gfx,
-	},
-};
-
 static const struct freq_tbl ftbl_gfx3d_clk_src[] = {
 	F_SLEW(19200000, P_BI_TCXO, 1, 0, 0, FIXED_FREQ_SRC),
 	F_SLEW(50000000, P_GPLL0_DIV2, 8, 0, 0, FIXED_FREQ_SRC),
@@ -1373,12 +1348,12 @@ static struct clk_rcg2 gfx3d_clk_src = {
 	.parent_map = gcc_gfx3d_map,
 	.flags = FORCE_ENABLE_RCG,
 	.clkr.hw.init = &(struct clk_init_data) {
-		.name = "gfx3d_clk_src",
+	        .name = "gfx3d_clk_src",
 		.parent_names = gcc_gfx3d_names,
 		.num_parents = ARRAY_SIZE(gcc_gfx3d_names),
 		.ops = &clk_rcg2_ops,
 		.flags = CLK_SET_RATE_PARENT,
-	}
+          },
 };
 
 static const struct freq_tbl ftbl_gp_clk_src[] = {
@@ -1895,6 +1870,7 @@ static const struct freq_tbl ftbl_usb30_master_clk_src[] = {
 
 static struct clk_rcg2 usb30_master_clk_src = {
 	.cmd_rcgr = 0x3f00c,
+	.mnd_width = 8,
 	.hid_width = 5,
 	.freq_tbl = ftbl_usb30_master_clk_src,
 	.enable_safe_config = true,
@@ -1903,11 +1879,12 @@ static struct clk_rcg2 usb30_master_clk_src = {
 		.name = "usb30_master_clk_src",
 		.parent_names = gcc_bi_tcxo_gpll0_gpll0div2_names,
 		.num_parents = ARRAY_SIZE(gcc_bi_tcxo_gpll0_gpll0div2_names),
+		.flags = CLK_SET_RATE_PARENT,
 		.ops = &clk_rcg2_ops,
 		.vdd_class = &vdd_cx,
 		.num_rate_max = VDD_NUM,
 		.rate_max = (unsigned long[VDD_NUM]) {
-			[VDD_LOW_SVS] = 400000000,
+			[VDD_LOW_SVS] = 800000000,
 			[VDD_NOMINAL] = 133330000},
 		},
 };
@@ -3841,8 +3818,8 @@ static struct clk_branch gcc_oxili_aon_clk = {
 			},
 			.num_parents = 1,
 			.ops = &clk_branch2_ops,
-		}
-	}
+		},
+	},
 };
 
 static struct clk_branch gcc_oxili_gfx3d_clk = {
@@ -3852,18 +3829,25 @@ static struct clk_branch gcc_oxili_gfx3d_clk = {
 		.enable_reg = 0x59020,
 		.enable_mask = BIT(0),
 		.hw.init = &(struct clk_init_data) {
-			.name = "gcc_oxili_gfx3d_clk",
-			.parent_names = (const char *[]){
-				"gfx3d_clk_src",
-			},
-			.num_parents = 1,
-			.ops = &clk_branch2_ops,
-			.flags = CLK_SET_RATE_PARENT,
-			.vdd_class = &vdd_gfx,
-		}
-	}
+		      .name = "gcc_oxili_gfx3d_clk",
+                      .parent_names = (const char *[]){
+                              "gfx3d_clk_src",
+                             },
+		      .num_parents = 1,
+		      .ops = &clk_branch2_ops,
+		      .flags = CLK_SET_RATE_PARENT,
+		      .vdd_class = &vdd_cx,
+		      .rate_max = (unsigned long[VDD_NUM]) {
+				[VDD_MIN_SVS] = 133330000, 
+				[VDD_LOW_SVS] = 216000000,
+				[VDD_SVS] = 320000000,
+				[VDD_SVS_PLUS] = 400000000,
+				[VDD_NOMINAL] = 510000000,
+				[VDD_NOMINAL_L1] = 560000000,
+				[VDD_HIGH] = 650000000},
+	      },
+        },
 };
-
 static struct clk_branch gcc_oxili_timer_clk = {
 	.halt_reg = 0x59040,
 	.halt_check = BRANCH_HALT,
@@ -4474,13 +4458,13 @@ static struct clk_regmap *gcc_msm8953_clocks[] = {
 	[GCC_MDSS_ESC1_CLK] = &gcc_mdss_esc1_clk.clkr,
 	[GCC_MDSS_MDP_CLK] = &gcc_mdss_mdp_clk.clkr,
 	[GCC_MDSS_VSYNC_CLK] = &gcc_mdss_vsync_clk.clkr,
+	[GFX3D_CLK_SRC] = &gfx3d_clk_src.clkr,
 	[GCC_OXILI_TIMER_CLK] = &gcc_oxili_timer_clk.clkr,
 	[GCC_OXILI_GFX3D_CLK] = &gcc_oxili_gfx3d_clk.clkr,
 	[GCC_OXILI_AON_CLK] = &gcc_oxili_aon_clk.clkr,
 	[GCC_OXILI_AHB_CLK] = &gcc_oxili_ahb_clk.clkr,
 	[GCC_BIMC_GFX_CLK] = &gcc_bimc_gfx_clk.clkr,
 	[GCC_BIMC_GPU_CLK] = &gcc_bimc_gpu_clk.clkr,
-	[GFX3D_CLK_SRC] = &gfx3d_clk_src.clkr,
 };
 
 static const struct qcom_reset_map gcc_msm8953_resets[] = {
@@ -4514,75 +4498,20 @@ static const struct of_device_id gcc_msm8953_match_table[] = {
 	{ .compatible = "qcom,gcc-msm8953" },
 	{},
 };
-
-static int of_get_fmax_vdd_class(struct platform_device *pdev,
-		struct clk_hw *hw, char *prop_name, u32 index)
-{
-	struct device_node *of = pdev->dev.of_node;
-	int prop_len, i, j;
-	struct clk_vdd_class *vdd = hw->init->vdd_class;
-	int num = vdd->num_regulators + 1;
-	u32 *array;
-
-	if (!of_find_property(of, prop_name, &prop_len)) {
-		dev_err(&pdev->dev, "missing %s\n", prop_name);
-		return -EINVAL;
-	}
-
-	prop_len /= sizeof(u32);
-	if (prop_len % num) {
-		dev_err(&pdev->dev, "bad length %d\n", prop_len);
-		return -EINVAL;
-	}
-
-	prop_len /= num;
-	vdd->level_votes = devm_kzalloc(&pdev->dev, prop_len * sizeof(int),
-					GFP_KERNEL);
-	if (!vdd->level_votes)
-		return -ENOMEM;
-
-	vdd->vdd_uv = devm_kzalloc(&pdev->dev,
-			prop_len * sizeof(int) * (num - 1), GFP_KERNEL);
-	if (!vdd->vdd_uv)
-		return -ENOMEM;
-
-	gpu_clks_init[index].rate_max = devm_kzalloc(&pdev->dev, prop_len *
-					sizeof(unsigned long), GFP_KERNEL);
-	if (!gpu_clks_init[index].rate_max)
-		return -ENOMEM;
-
-	array = kzalloc(prop_len * sizeof(u32) * num,
-				GFP_KERNEL);
-	if (!array)
-		return -ENOMEM;
-
-	of_property_read_u32_array(of, prop_name, array, prop_len * num);
-	for (i = 0; i < prop_len; i++) {
-		gpu_clks_init[index].rate_max[i] = array[num * i];
-		for (j = 1; j < num; j++) {
-			vdd->vdd_uv[(num - 1) * i + (j - 1)] =
-						array[num * i + j];
-		}
-	}
-
-	kfree(array);
-	vdd->num_levels = prop_len;
-	vdd->cur_level = prop_len;
-	gpu_clks_init[index].num_rate_max = prop_len;
-
-	return 0;
-}
+MODULE_DEVICE_TABLE(of, gcc_msm8953_match_table);
 
 static int gcc_msm8953_probe(struct platform_device *pdev)
 {
-	int i, ret;
+	int i, ret, val;
 	struct regmap *regmap;
         struct clk *clk;
-        
+        unsigned int regval;
+        #define GX_DOMAIN_MISC 0x5B00C
 	regmap  = qcom_cc_map(pdev, &gcc_msm8953_desc);
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
-
+		
+        /* Configure GPU PLL */
 	clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_out_main_config);
 
 	clk = clk_get(&pdev->dev, "bi_tcxo");
@@ -4600,33 +4529,25 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
 		return PTR_ERR(vdd_cx.regulator[0]);
 	}
 	
-	/* GFX Rail Regulator for GFX3D clock */
-	vdd_gfx.regulator[0] = devm_regulator_get(&pdev->dev, "vdd_gfx");
-	if (IS_ERR(vdd_gfx.regulator[0])) {
-		if (!(PTR_ERR(vdd_gfx.regulator[0]) == -EPROBE_DEFER))
-			dev_err(&pdev->dev,
-					"Unable to get vdd_gfx regulator\n");
-		return PTR_ERR(vdd_gfx.regulator[0]);
-	}
-
-        /* GFX rail fmax data linked to branch clock */
-	ret = of_get_fmax_vdd_class(pdev, &gcc_oxili_gfx3d_clk.clkr.hw,
-					"qcom,gfxfreq-corner", 1);
-
+	/* Oxili Ocmem in GX rail: OXILI_GMEM_CLAMP_IO */
+                val = regmap_read(regmap, 0x5B00C, &val);
+		val &= ~BIT(0);
+		regmap_write(regmap, 0x5B00C, val);
+		
+	dev_err(&pdev->dev, "wrote %x to gx_misc \n", regval);
 	ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
-	if (ret) {
-		dev_err(&pdev->dev, "Failed to register hardware clock\n");
-		return ret;
-	}
-	
-	return qcom_cc_really_probe(pdev, &gcc_msm8953_desc, regmap);
+
+	ret = qcom_cc_really_probe(pdev, &gcc_msm8953_desc, regmap);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register GCC clocks\n");
 		return ret;
 	}
 	
-	dev_info(&pdev->dev, "Registered GCC clocks\n");
+	clk_set_rate(apss_ahb_clk_src.clkr.hw.clk, 19200000);
+	clk_prepare_enable(apss_ahb_clk_src.clkr.hw.clk);
 
+	dev_err(&pdev->dev, "Registered GCC clocks\n");
+	
 	return 0;
 	
 }
@@ -4707,7 +4628,23 @@ static int mdss_msm8953_probe(struct platform_device *pdev)
 		return PTR_ERR(clk);
 	}
 	clk_put(clk);
+        
+        	clk = clk_get(&pdev->dev, "pclk1_src");
+	if (IS_ERR(clk)) {
+		if (PTR_ERR(clk) != -EPROBE_DEFER)
+			dev_err(&pdev->dev, "Unable to get pclk0_src clock\n");
+		return PTR_ERR(clk);
+	}
+	clk_put(clk);
 
+	clk = clk_get(&pdev->dev, "byte1_src");
+	if (IS_ERR(clk)) {
+		if (PTR_ERR(clk) != -EPROBE_DEFER)
+			dev_err(&pdev->dev, "Unable to get byte0_src clock\n");
+		return PTR_ERR(clk);
+	}
+	clk_put(clk);
+	
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (res == NULL) {
 		dev_err(&pdev->dev, "Failed to get resources\n");
@@ -4723,20 +4660,15 @@ static int mdss_msm8953_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-        ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
-	if (ret) {
-		dev_err(&pdev->dev, "Failed to register hardware clock\n");
-		return ret;
-	}
 	ret = qcom_cc_really_probe(pdev, &mdss_msm8953_desc, regmap);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register MDSS clocks\n");
 		return ret;
 	}
 
-	dev_info(&pdev->dev, "Registered GCC MDSS Clocks\n");
+	dev_err(&pdev->dev, "Registered GCC MDSS Clocks\n");
 
-	return ret;
+	return 0;
 }
 
 static struct platform_driver mdss_msm8953_driver = {

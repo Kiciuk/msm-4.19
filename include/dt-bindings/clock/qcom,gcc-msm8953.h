@@ -220,17 +220,4 @@
 #define GCC_USB3PHY_PHY_BCR			3
 #define GCC_USB3_PHY_BCR			4
 #define GCC_USB_30_BCR				5
-
-/* GDSCs */
-#define CPP_GDSC				0
-#define JPEG_GDSC				1
-#define MDSS_GDSC				2
-#define OXILI_CX_GDSC				3
-#define OXILI_GX_GDSC				4
-#define USB30_GDSC				5
-#define VENUS_CORE0_GDSC			6
-#define VENUS_GDSC				7
-#define VFE0_GDSC				8
-#define VFE1_GDSC				9
-
 #endif
