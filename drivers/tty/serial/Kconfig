@@ -8,8 +8,10 @@ menu "Serial drivers"
 	depends on HAS_IOMEM
 
 config SERIAL_EARLYCON
+	tristate "SERIAL EARLYCON SUPPORT"
 	bool
 	depends on SERIAL_CORE
+	select SERIAL_CORE_CONSOLE
 	help
 	  Support for early consoles with the earlycon parameter. This enables
 	  the console before standard serial driver is probed. The console is
