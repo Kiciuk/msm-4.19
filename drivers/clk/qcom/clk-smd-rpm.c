@@ -1182,6 +1182,66 @@ static const struct rpm_smd_clk_desc rpm_clk_qm215 = {
 	.num_clks = ARRAY_SIZE(qm215_clks),
 };
 
+/* msm8953 SMD clocks */
+static struct clk_hw *msm8953_clks[] = {
+	[RPM_SMD_XO_CLK_SRC] = &sdm429w_bi_tcxo.hw,
+	[RPM_SMD_XO_A_CLK_SRC] = &sdm429w_bi_tcxo_ao.hw,
+	[RPM_SMD_QDSS_CLK] = &sdm429w_qdss_clk.hw,
+	[RPM_SMD_QDSS_A_CLK] = &sdm429w_qdss_a_clk.hw,
+	[RPM_SMD_PNOC_CLK] = &sdm429w_pnoc_clk.hw,
+	[RPM_SMD_PNOC_A_CLK] = &sdm429w_pnoc_a_clk.hw,
+	[RPM_SMD_SNOC_CLK] = &sdm429w_snoc_clk.hw,
+	[RPM_SMD_SNOC_A_CLK] = &sdm429w_snoc_a_clk.hw,
+	[RPM_SMD_BIMC_CLK] = &sdm429w_bimc_clk.hw,
+	[RPM_SMD_BIMC_A_CLK] = &sdm429w_bimc_a_clk.hw,
+	[RPM_SMD_SYSMMNOC_CLK] = &sdm429w_sysmmnoc_clk.hw,
+	[RPM_SMD_SYSMMNOC_A_CLK] = &sdm429w_sysmmnoc_a_clk.hw,
+	[RPM_SMD_BB_CLK1] = &sdm429w_bb_clk1.hw,
+	[RPM_SMD_BB_CLK1_A] = &sdm429w_bb_clk1_a.hw,
+	[RPM_SMD_BB_CLK2] = &sdm429w_bb_clk2.hw,
+	[RPM_SMD_BB_CLK2_A] = &sdm429w_bb_clk2_a.hw,
+	[RPM_SMD_BB_CLK1_PIN] = &sdm429w_bb_clk1_pin.hw,
+	[RPM_SMD_BB_CLK1_A_PIN] = &sdm429w_bb_clk1_a_pin.hw,
+	[RPM_SMD_BB_CLK2_PIN] = &sdm429w_bb_clk2_pin.hw,
+	[RPM_SMD_BB_CLK2_A_PIN] = &sdm429w_bb_clk2_a_pin.hw,
+	[RPM_SMD_RF_CLK2] = &sdm429w_rf_clk2.hw,
+	[RPM_SMD_RF_CLK3] = &scuba_rf_clk3.hw,
+	[RPM_SMD_RF_CLK3_A] = &scuba_rf_clk3_a.hw,
+	[RPM_SMD_DIV_CLK2] = &sdm429w_div_clk2.hw,
+	[RPM_SMD_DIV_A_CLK2] = &sdm429w_div_clk2_a.hw,
+	[PNOC_MSMBUS_CLK] = &pnoc_msmbus_clk.hw,
+	[PNOC_MSMBUS_A_CLK] = &pnoc_msmbus_a_clk.hw,
+	[PNOC_KEEPALIVE_A_CLK] = &pnoc_keepalive_a_clk.hw,
+	[SNOC_MSMBUS_CLK] = &snoc_msmbus_clk.hw,
+	[SNOC_MSMBUS_A_CLK] = &snoc_msmbus_a_clk.hw,
+	[RPM_SMD_IPA_CLK] = &sdm660_ipa_clk.hw,
+	[RPM_SMD_IPA_A_CLK] = &sdm660_ipa_a_clk.hw,
+	[BIMC_MSMBUS_CLK] = &bimc_msmbus_clk.hw,
+	[BIMC_MSMBUS_A_CLK] = &bimc_msmbus_a_clk.hw,
+	[PNOC_USB_CLK] = &pnoc_usb_clk.hw,
+	[PNOC_USB_A_CLK] = &pnoc_usb_a_clk.hw,
+	[SNOC_USB_CLK] = &snoc_usb_clk.hw,
+	[SNOC_USB_A_CLK] = &snoc_usb_a_clk.hw,
+	[BIMC_USB_CLK] = &bimc_usb_clk.hw,
+	[BIMC_USB_A_CLK] = &bimc_usb_a_clk.hw,
+	[SNOC_WCNSS_A_CLK] = &snoc_wcnss_a_clk.hw,
+	[BIMC_WCNSS_A_CLK] = &bimc_wcnss_a_clk.hw,
+	[SYSMMNOC_MSMBUS_CLK] = &sysmmnoc_msmbus_clk.hw,
+	[SYSMMNOC_MSMBUS_A_CLK] = &sysmmnoc_msmbus_a_clk.hw,
+	[CXO_SMD_OTG_CLK] = &bi_tcxo_otg_clk.hw,
+	[CXO_SMD_LPM_CLK] = &bi_tcxo_lpm_clk.hw,
+	[CXO_SMD_PIL_PRONTO_CLK] = &bi_tcxo_pil_pronto_clk.hw,
+	[CXO_SMD_PIL_MSS_CLK] = &bi_tcxo_pil_mss_clk.hw,
+	[CXO_SMD_WLAN_CLK] = &bi_tcxo_wlan_clk.hw,
+	[CXO_SMD_PIL_LPASS_CLK] = &bi_tcxo_pil_lpass_clk.hw,
+};
+
+static const struct rpm_smd_clk_desc rpm_clk_msm8953 = {
+	.clks = msm8953_clks,
+	.num_rpm_clks = RPM_SMD_SYSMMNOC_A_CLK,
+	.num_clks = ARRAY_SIZE(msm8953_clks),
+};
+
 static const struct of_device_id rpm_smd_clk_match_table[] = {
 	{ .compatible = "qcom,rpmcc-msm8916", .data = &rpm_clk_msm8916 },
 	{ .compatible = "qcom,rpmcc-msm8974", .data = &rpm_clk_msm8974 },
@@ -1191,6 +1251,8 @@ static const struct of_device_id rpm_smd_clk_match_table[] = {
 	{ .compatible = "qcom,rpmcc-sdm660",  .data = &rpm_clk_sdm660  },
 	{ .compatible = "qcom,rpmcc-qm215",  .data = &rpm_clk_qm215 },
 	{ .compatible = "qcom,rpmcc-sdm439",  .data = &rpm_clk_qm215 },
+	{ .compatible = "qcom,rpmcc-msm8940",  .data = &rpm_clk_qm215 },
+	{ .compatible = "qcom,rpmcc-msm8953",  .data = &rpm_clk_msm8953 },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, rpm_smd_clk_match_table);
@@ -1201,7 +1263,7 @@ static int rpm_smd_clk_probe(struct platform_device *pdev)
 	struct clk *clk;
 	struct rpm_cc *rcc;
 	struct clk_onecell_data *data;
-	int ret, is_bengal, is_scuba, is_sdm660, is_qm215, is_sdm439;
+	int ret, is_bengal, is_scuba, is_sdm660, is_qm215, is_sdm439, is_msm8940, is_msm8953;
 	size_t num_clks, i;
 	struct clk_hw **hw_clks;
 	const struct rpm_smd_clk_desc *desc;
@@ -1225,14 +1287,26 @@ static int rpm_smd_clk_probe(struct platform_device *pdev)
 
 	is_sdm439 = of_device_is_compatible(pdev->dev.of_node,
 						"qcom,rpmcc-sdm439");
-
+	
+	is_msm8940 = of_device_is_compatible(pdev->dev.of_node,
+						"qcom,rpmcc-msm8940");
+	is_msm8953 = of_device_is_compatible(pdev->dev.of_node,
+						"qcom,rpmcc-msm8953");
+	
+	if (is_msm8940) {
+		is_sdm439 = 1;
+	} else if (is_sdm439 || is_qm215) {
+		rpm_clk_qm215.clks[RPM_SMD_IPA_CLK] = NULL;
+		rpm_clk_qm215.clks[RPM_SMD_IPA_A_CLK] = NULL;
+	}
+	
 	if (is_sdm660) {
 		ret = clk_vote_bimc(&sdm660_bimc_clk.hw, INT_MAX);
 		if (ret < 0)
 			return ret;
 	}
 
-	if (is_qm215 || is_sdm439) {
+	if (is_qm215 || is_sdm439 || is_msm8953) {
 		ret = clk_vote_bimc(&sdm429w_bimc_clk.hw, INT_MAX);
 		if (ret < 0)
 			return ret;
@@ -1326,7 +1400,7 @@ static int rpm_smd_clk_probe(struct platform_device *pdev)
 		/* Hold an active set vote for the cnoc_periph resource */
 		clk_set_rate(cnoc_periph_keepalive_a_clk.hw.clk, 19200000);
 		clk_prepare_enable(cnoc_periph_keepalive_a_clk.hw.clk);
-	} else if (is_qm215 || is_sdm439) {
+	} else if (is_qm215 || is_sdm439 || is_msm8953) {
 		clk_prepare_enable(sdm429w_bi_tcxo_ao.hw.clk);
 
 		/*
