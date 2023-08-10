@@ -511,6 +511,12 @@ dtb-$(CONFIG_ARCH_SDM429) += sdm429-mtp.dtb \
 	sdm429-qrd.dtb \
 	sda429-mtp.dtb \
 	sda429-cdp.dtb
+	
+dtb-$(CONFIG_ARCH_MSM8953) += msm8953-cdp.dtb \
+	msm8953-mtp.dtb \
+	msm8953-qrd-sku3.dtb \
+	msm8953-qrd-sku3-mido.dtb 
+
 endif
 endif #CONFIG_BOARD_BRAMBLE CONFIG_BOARD_REDFIN CONFIG_BOARD_BARBET
 

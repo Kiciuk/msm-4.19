@@ -22,6 +22,8 @@
 	compatible = "qcom,msm8953-qrd-sku3",
 		   "qcom,msm8953-qrd", "qcom,msm8953", "qcom,qrd";
 	qcom,board-id= <0x0b 0>;
+	qcom,pmic-id = <0x010016 0x010011 0x0 0x0>;
+	qcom,pmic-name = "PMI8950";
 
 };
 
