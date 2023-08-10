@@ -1689,7 +1689,7 @@ static int __init msm_pil_init(void)
 	}
 	for (i = 0; i < resource_size(&res)/sizeof(u32); i++)
 		writel_relaxed(0, pil_info_base + (i * sizeof(u32)));
-
+        #ifndef CONFIG_ARCH_MSM8953
 	/* Get Global minidump ToC*/
 	g_md_toc = qcom_smem_get(QCOM_SMEM_HOST_ANY, SBL_MINIDUMP_SMEM_ID,
 				 &size);
@@ -1698,7 +1698,7 @@ static int __init msm_pil_init(void)
 		pr_err("SMEM is not initialized.\n");
 		return -EPROBE_DEFER;
 	}
-
+#endif
 	pil_wq = alloc_workqueue("pil_workqueue", WQ_HIGHPRI | WQ_UNBOUND, 0);
 	if (!pil_wq)
 		pr_warn("pil: Defaulting to sequential firmware loading.\n");

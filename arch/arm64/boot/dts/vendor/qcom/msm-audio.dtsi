@@ -797,7 +797,7 @@
 		compatible = "qcom,wcd9xxx-irq";
 		interrupt-controller;
 		#interrupt-cells = <1>;
-		interrupts = <0 177 0>;
+		interrupts = <GIC_SPI 177 IRQ_TYPE_LEVEL_HIGH>;
 		interrupt-names = "wcd_irq";
 	};
 
