@@ -4507,13 +4507,7 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
         struct clk *clk;
         unsigned int regval;
         #define GX_DOMAIN_MISC 0x5B00C
-	regmap  = qcom_cc_map(pdev, &gcc_msm8953_desc);
-	if (IS_ERR(regmap))
-		return PTR_ERR(regmap);
-		
-        /* Configure GPU PLL */
-	clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_out_main_config);
-
+        pr_err("GCC: Fetching clocks");
 	clk = clk_get(&pdev->dev, "bi_tcxo");
 	if (IS_ERR(clk)) {
 		if (PTR_ERR(clk) != -EPROBE_DEFER)
@@ -4521,20 +4515,32 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
 		return PTR_ERR(clk);
 	}
 	clk_put(clk);
-
+	
+         pr_err("GCC: Fetching regulators");
 	vdd_cx.regulator[0] = devm_regulator_get(&pdev->dev, "vdd_cx");
 	if (IS_ERR(vdd_cx.regulator[0])) {
+	      return -EPROBE_DEFER;
+	
 		if (PTR_ERR(vdd_cx.regulator[0]) != -EPROBE_DEFER)
 			dev_err(&pdev->dev, "Unable to get vdd_cx regulator\n");
 		return PTR_ERR(vdd_cx.regulator[0]);
 	}
 	
+	 pr_err("GCC: mapping");
+	regmap  = qcom_cc_map(pdev, &gcc_msm8953_desc);
+	if (IS_ERR(regmap))
+		return PTR_ERR(regmap);
+ pr_err("GCC: updating register");
 	/* Oxili Ocmem in GX rail: OXILI_GMEM_CLAMP_IO */
                 val = regmap_read(regmap, 0x5B00C, &val);
 		val &= ~BIT(0);
 		regmap_write(regmap, 0x5B00C, val);
 		
 	dev_err(&pdev->dev, "wrote %x to gx_misc \n", regval);
+
+	 /* Configure GPU PLL */
+        clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_out_main_config);
+ pr_err("GCC: configured PLL");
 	ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
 
 	ret = qcom_cc_really_probe(pdev, &gcc_msm8953_desc, regmap);
@@ -4542,7 +4548,7 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "Failed to register GCC clocks\n");
 		return ret;
 	}
-	
+	 pr_err("GCC: setting apss_ahb");
 	clk_set_rate(apss_ahb_clk_src.clkr.hw.clk, 19200000);
 	clk_prepare_enable(apss_ahb_clk_src.clkr.hw.clk);
 
@@ -4612,7 +4618,7 @@ static int mdss_msm8953_probe(struct platform_device *pdev)
 	struct resource *res;
 	void __iomem *base;
 	int ret;
-
+ pr_err("GCC_MDSS: Fetching clocks");
 	clk = clk_get(&pdev->dev, "pclk0_src");
 	if (IS_ERR(clk)) {
 		if (PTR_ERR(clk) != -EPROBE_DEFER)
@@ -4650,7 +4656,7 @@ static int mdss_msm8953_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "Failed to get resources\n");
 		return -EINVAL;
 	}
-
+ pr_err("GCC_MDSS: ioremapping");
 	base = devm_ioremap(&pdev->dev, res->start, resource_size(res));
 	if (IS_ERR(base))
 		return PTR_ERR(base);
@@ -4668,7 +4674,7 @@ static int mdss_msm8953_probe(struct platform_device *pdev)
 
 	dev_err(&pdev->dev, "Registered GCC MDSS Clocks\n");
 
-	return 0;
+	return ret;
 }
 
 static struct platform_driver mdss_msm8953_driver = {
