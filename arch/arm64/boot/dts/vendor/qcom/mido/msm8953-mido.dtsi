@@ -39,7 +39,7 @@
 
 &mdss_dsi1 {
 
-	status = "okay";
+	status = "disabled";
 };
 
 &mdss_rotator {
