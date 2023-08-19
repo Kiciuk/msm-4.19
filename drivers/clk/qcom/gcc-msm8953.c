@@ -62,6 +62,25 @@ static struct clk_alpha_pll gpll0_out_main = {
 		},
 };
 
+static struct clk_alpha_pll gpll0_ao_out_main = {
+	.offset = 0x21000,
+	.soft_vote = &soft_vote_gpll0,
+	.soft_vote_mask = PLL_SOFT_VOTE_CPU,
+	.flags = SUPPORTS_FSM_MODE,
+	.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
+	.clkr = {
+		.enable_reg = 0x45000,
+		.enable_mask = BIT(0),
+		.hw.init = &(struct clk_init_data){
+			.name = "gpll0_ao_out_main",
+			.parent_names = (const char *[]){ "bi_tcxo_ao" },
+			.num_parents = 1,
+			.ops = &clk_alpha_pll_ops,
+		},
+	},
+};
+
+
 static struct clk_fixed_factor gpll0_out_aux = {
 	.mult = 1,
 	.div = 2,
@@ -4464,6 +4483,7 @@ static struct clk_regmap *gcc_msm8953_clocks[] = {
 	[GCC_OXILI_AHB_CLK] = &gcc_oxili_ahb_clk.clkr,
 	[GCC_BIMC_GFX_CLK] = &gcc_bimc_gfx_clk.clkr,
 	[GCC_BIMC_GPU_CLK] = &gcc_bimc_gpu_clk.clkr,
+	[GPLL0_AO_OUT_MAIN] = &gpll0_ao_out_main.clkr,
 };
 
 static const struct qcom_reset_map gcc_msm8953_resets[] = {
@@ -4552,6 +4572,7 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
 	 pr_err("GCC: setting apss_ahb");
 	clk_set_rate(apss_ahb_clk_src.clkr.hw.clk, 19200000);
 	clk_prepare_enable(apss_ahb_clk_src.clkr.hw.clk);
+	clk_prepare_enable(gpll0_ao_out_main.clkr.hw.clk);
 
 	dev_err(&pdev->dev, "Registered GCC clocks\n");
 	

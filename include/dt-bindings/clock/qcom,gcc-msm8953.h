@@ -210,6 +210,7 @@
 #define VSYNC_CLK_SRC				203
 #define MDSS_MDP_VOTE_CLK                       204
 #define MDSS_ROTATOR_VOTE_CLK                   205
+#define GPLL0_AO_OUT_MAIN                       206
 
 /* GCC block resets */
 #define GCC_CAMSS_MICRO_BCR			0
