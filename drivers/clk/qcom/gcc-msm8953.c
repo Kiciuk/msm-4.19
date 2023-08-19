@@ -4268,7 +4268,6 @@ static struct clk_branch gcc_vfe_tbu_clk = {
 };
 struct clk_hw *gcc_msm8953_hws[] = { 
 	[GPLL0_OUT_AUX] = &gpll0_out_aux.hw,
-	[GPLL3_OUT_MAIN_DIV] = &gpll3_out_main_div.hw,
 	[GPLL6_OUT_MAIN_DIV] = &gpll6_out_main_div.hw,
 };
 static struct clk_regmap *gcc_msm8953_clocks[] = {
@@ -4480,7 +4479,7 @@ static const struct regmap_config gcc_msm8953_regmap_config = {
 	.reg_bits	= 32,
 	.reg_stride	= 4,
 	.val_bits	= 32,
-	.max_register	= 0x80000,
+	.max_register = 0x7f000,
 	.fast_io	= true,
 };
 
@@ -4519,8 +4518,6 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
          pr_err("GCC: Fetching regulators");
 	vdd_cx.regulator[0] = devm_regulator_get(&pdev->dev, "vdd_cx");
 	if (IS_ERR(vdd_cx.regulator[0])) {
-	      return -EPROBE_DEFER;
-	
 		if (PTR_ERR(vdd_cx.regulator[0]) != -EPROBE_DEFER)
 			dev_err(&pdev->dev, "Unable to get vdd_cx regulator\n");
 		return PTR_ERR(vdd_cx.regulator[0]);
@@ -4542,7 +4539,11 @@ static int gcc_msm8953_probe(struct platform_device *pdev)
         clk_alpha_pll_configure(&gpll3_out_main, regmap, &gpll3_out_main_config);
  pr_err("GCC: configured PLL");
 	ret = devm_clk_hw_register(&pdev->dev, &gpll3_out_main_div.hw);
-
+         if (ret) {
+                dev_err(&pdev->dev, "Failed to register hardware clock\n");
+                return ret;
+        }
+        
 	ret = qcom_cc_really_probe(pdev, &gcc_msm8953_desc, regmap);
 	if (ret) {
 		dev_err(&pdev->dev, "Failed to register GCC clocks\n");
