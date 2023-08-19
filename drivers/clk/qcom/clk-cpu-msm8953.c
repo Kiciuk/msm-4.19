@@ -11,7 +11,7 @@
 #include <linux/pm_opp.h>
 #include <linux/platform_device.h>
 #include <linux/regmap.h>
-#include <dt-bindings/clock/qcom,cpu-sdm.h>
+#include <dt-bindings/clock/qcom,cpu-msm8953.h>
 #include <linux/suspend.h>
 #include <linux/slab.h>
 #include <linux/pm_qos.h>
@@ -28,10 +28,9 @@
 #define to_clk_regmap_mux_div(_hw) \
 	container_of(to_clk_regmap(_hw), struct clk_regmap_mux_div, clkr)
 
-static DEFINE_VDD_REGULATORS(vdd_hf_pll, VDD_HF_PLL_NUM, 2, vdd_hf_levels);
-static DEFINE_VDD_REGS_INIT(vdd_cpu_c0, 1);
-static DEFINE_VDD_REGS_INIT(vdd_cpu_c1, 1);
+static DEFINE_VDD_REGULATORS(vdd_hf_pll, VDD_HF_PLL_NUM, 1, vdd_hf_levels);
 static DEFINE_VDD_REGS_INIT(vdd_cpu_cci, 1);
+
 
 enum apcs_mux_clk_parent {
 	P_BI_TCXO_AO,
@@ -194,10 +193,13 @@ static unsigned long cpucc_clk_recalc_rate(struct clk_hw *hw,
 
 	cpuclk->src = src;
 	cpuclk->div = div;
+	
+	pr_err("cpucc_clk_recalc_rate: src: %x div: %x num_parents: %d",src,div,num_parents);
 
 	for (i = 0; i < num_parents; i++) {
 		if (src == cpuclk->parent_map[i].cfg) {
 			parent = clk_hw_get_parent_by_index(hw, i);
+			pr_err("executed parent query nr: %d",i);
 			parent_rate = clk_hw_get_rate(parent);
 			return calc_rate(parent_rate, 0, 0, 0, div);
 		}
@@ -321,22 +323,19 @@ static struct clk_alpha_pll apcs_cpu_pll0 = {
 	.vco_table = msm8953_vco,
 	.num_vco = ARRAY_SIZE(msm8953_vco),
 	.regs = clk_alpha_pll_regs_offset[CLK_ALPHA_PLL_TYPE_DEFAULT],
-    /*
-	.spm_ctrl = {
-		.offset = 0x50,
-		.event_bit = 0x4,
-	},
-	*/
-	.clkr.hw.init = &(struct clk_init_data){
-		.name = "apcs_cpu_pll0",
-		.parent_names = (const char *[]){ "bi_tcxo_ao" },
-		.num_parents = 1,
-		.ops = &clk_alpha_pll_hwfsm_ops,
-		.vdd_class = &vdd_hf_pll,
-		.rate_max = (unsigned long[VDD_HF_PLL_NUM]) {
-			[VDD_HF_PLL_SVS] = 1000000000,
-			[VDD_HF_PLL_NOM] = 2020000000,},
-		.num_rate_max = VDD_HF_PLL_NUM,
+	.clkr = {
+	      .enable_reg = 0x0,
+	      .enable_mask = BIT(0),
+	      .hw.init = &(struct clk_init_data) {
+		      .name = "apcs_cpu_pll0",
+		      .parent_names = (const char *[]){ "bi_tcxo_ao" },
+		      .num_parents = 1,
+		      .ops = &clk_alpha_pll_ops,
+		      .vdd_class = &vdd_hf_pll,
+		      .rate_max = (unsigned long[VDD_HF_PLL_NUM]) {
+			      [VDD_HF_PLL_SVS] = 2400000000,},
+		      .num_rate_max = VDD_HF_PLL_NUM,
+	        },
 	},
 };
 
@@ -364,7 +363,7 @@ static struct clk_regmap_mux_div apcs_mux_c0_clk = {
 		.name = "apcs_mux_c0_clk",
 		.parent_names = apcs_mux_clk_parent_name0,
 		.num_parents = 3,
-		.vdd_class = &vdd_cpu_c0,
+		.vdd_class = &vdd_cpu_cci,
 		.flags = CLK_SET_RATE_PARENT,
 		.ops = &cpucc_clk_ops,
 	},
@@ -394,7 +393,7 @@ static struct clk_regmap_mux_div apcs_mux_c1_clk = {
 		.name = "apcs_mux_c1_clk",
 		.parent_names = apcs_mux_clk_parent_name0,
 		.num_parents = 3,
-		.vdd_class = &vdd_cpu_c1,
+		.vdd_class = &vdd_cpu_cci,
 		.flags = CLK_SET_RATE_PARENT,
 		.ops = &cpucc_clk_ops,
 	},
@@ -428,7 +427,7 @@ static struct regmap_config cpu_regmap_config = {
 	.reg_bits	= 32,
 	.reg_stride	= 4,
 	.val_bits	= 32,
-	.max_register	= 0x34,
+	.max_register	= 0x400,
 	.fast_io	= true,
 };
 
@@ -451,14 +450,14 @@ static void cpucc_clk_get_speed_bin(struct platform_device *pdev, int *bin,
 
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "efuse");
 	if (!res) {
-		dev_info(&pdev->dev,
+		dev_err(&pdev->dev,
 			"No speed/PVS binning available. Defaulting to 0!\n");
 		return;
 	}
 
 	base = ioremap(res->start, resource_size(res));
 	if (!base) {
-		dev_info(&pdev->dev,
+		dev_err(&pdev->dev,
 			"Unable to read efuse data. Defaulting to 0!\n");
 		return;
 	}
@@ -468,7 +467,7 @@ static void cpucc_clk_get_speed_bin(struct platform_device *pdev, int *bin,
 
 	*bin = (pte_efuse >> 8) & 0x7;
 
-	dev_info(&pdev->dev, "PVS version: %d speed bin: %d\n", *version, *bin);
+	dev_err(&pdev->dev, "PVS version: %d speed bin: %d\n", *version, *bin);
 }
 
 static int cpucc_clk_get_fmax_vdd_class(struct platform_device *pdev,
@@ -604,9 +603,9 @@ static void cpucc_clk_print_opp_table(int c0, int c1)
 	oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c1),
 		apc_c1_fmin, true);
 
-	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
+	pr_err("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
 		 apc_c1_fmin, dev_pm_opp_get_voltage(oppfmin));
-	pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
+	pr_err("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c1,
 		 apc_c1_fmax, dev_pm_opp_get_voltage(oppfmax));
 
 		max_index = apcs_mux_c0_clk.clkr.hw.init->num_rate_max;
@@ -619,9 +618,9 @@ static void cpucc_clk_print_opp_table(int c0, int c1)
 		oppfmin = dev_pm_opp_find_freq_exact(get_cpu_device(c0),
 			apc_c0_fmin, true);
 
-		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
+		pr_err("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
 			 apc_c0_fmin, dev_pm_opp_get_voltage(oppfmin));
-		pr_info("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
+		pr_err("Clock_cpu:(cpu %d) OPP voltage for %lu: %ld\n", c0,
 			 apc_c0_fmax, dev_pm_opp_get_voltage(oppfmax));
 }
 
@@ -760,79 +759,7 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "Failed to ioremap c0 spm registers\n");
 		return -ENOMEM;
 	}
-	/* Bring SPM pls
-	apcs_cpu_pll0.spm_ctrl.spm_base = base;
-*/
-	snprintf(prop_name, ARRAY_SIZE(prop_name),
-		"qcom,speed%d-bin-v%d-%s", speed_bin, version, "c0");
-
-	ret = cpucc_clk_get_fmax_vdd_class(pdev,
-		(struct clk_init_data *)apcs_mux_c0_clk.clkr.hw.init,
-			 prop_name);
-	if (ret) {
-		dev_err(&pdev->dev, "Didn't get c0 speed bin\n");
-
-		snprintf(prop_name, ARRAY_SIZE(prop_name),
-				"qcom,speed0-bin-v0-%s", "c0");
-		ret = cpucc_clk_get_fmax_vdd_class(pdev,
-			(struct clk_init_data *)
-			apcs_mux_c0_clk.clkr.hw.init,
-				prop_name);
-		if (ret) {
-			dev_err(&pdev->dev,
-				"Unable to load safe voltage plan for c0\n");
-			return ret;
-		}
-	}
 	
-	 /* Rail Regulator for apcs_pll0 */
-	vdd_hf_pll.regulator[0] = devm_regulator_get(&pdev->dev, "cpu-vdd");
-	if (IS_ERR(vdd_hf_pll.regulator[0])) {
-		if (!(PTR_ERR(vdd_hf_pll.regulator[0]) == -EPROBE_DEFER))
-			dev_err(&pdev->dev,
-				"Unable to get vdd_hf_pll regulator\n");
-		return PTR_ERR(vdd_hf_pll.regulator[0]);
-	}
-
-	vdd_hf_pll.regulator[1] = devm_regulator_get(&pdev->dev, "vdd_dig_ao");
-	if (IS_ERR(vdd_hf_pll.regulator[1])) {
-		if (!(PTR_ERR(vdd_hf_pll.regulator[1]) == -EPROBE_DEFER))
-			dev_err(&pdev->dev,
-				"Unable to get vdd_dig_ao regulator\n");
-		return PTR_ERR(vdd_hf_pll.regulator[1]);
-	}
-	
-	/* Rail Regulator for APCS C0 mux */
-	vdd_cpu_c0.regulator[0] = devm_regulator_get(&pdev->dev,
-			"cpu-vdd");
-	if (IS_ERR(vdd_cpu_c0.regulator[0])) {
-		if (!(PTR_ERR(vdd_cpu_c0.regulator[0]) ==
-					-EPROBE_DEFER))
-			dev_err(&pdev->dev, "Unable to get C0 cpu-vdd regulator\n");
-		return PTR_ERR(vdd_cpu_c0.regulator[0]);
-	}
-	
-	/* Rail Regulator for APCS C1 mux */
-	vdd_cpu_c1.regulator[0] = devm_regulator_get(&pdev->dev, "cpu-vdd");
-	if (IS_ERR(vdd_cpu_c1.regulator[0])) {
-		if (!(PTR_ERR(vdd_cpu_c1.regulator[0]) == -EPROBE_DEFER))
-			dev_err(&pdev->dev,
-				"Unable to get cpu-vdd regulator\n");
-		return PTR_ERR(vdd_cpu_c1.regulator[0]);
-	}
-
-	/* Rail Regulator for APCS CCI mux */
-		vdd_cpu_cci.regulator[0] =
-			devm_regulator_get(&pdev->dev, "cpu-vdd");
-		if (IS_ERR(vdd_cpu_cci.regulator[0])) {
-			if (!(PTR_ERR(vdd_cpu_cci.regulator[0]) ==
-						-EPROBE_DEFER))
-				dev_err(&pdev->dev,
-					"Unable to get cpu-vdd regulator\n");
-			return PTR_ERR(vdd_cpu_cci.regulator[0]);
-		}
-	
-
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
 			 "apcs-c1-rcg-base");
 	if (res == NULL) {
@@ -874,11 +801,54 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 			dev_err(&pdev->dev, "Couldn't get regmap for apcs-cci-rcg\n");
 			return PTR_ERR(apcs_mux_cci_clk.clkr.regmap);
 		}
-	
 
+	
+	
+	pr_err("regmaped everything atleast");
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/* Get speed bin information */
 	cpucc_clk_get_speed_bin(pdev, &speed_bin, &version);
+	
+	/* Bring SPM pls
+	apcs_cpu_pll0.spm_ctrl.spm_base = base;
+*/
+	snprintf(prop_name, ARRAY_SIZE(prop_name),
+		"qcom,speed%d-bin-v%d-%s", speed_bin, version, "c0");
 
+	ret = cpucc_clk_get_fmax_vdd_class(pdev,
+		(struct clk_init_data *)apcs_mux_c0_clk.clkr.hw.init,
+			 prop_name);
+	if (ret) {
+		dev_err(&pdev->dev, "Didn't get c0 speed bin\n");
+
+		snprintf(prop_name, ARRAY_SIZE(prop_name),
+				"qcom,speed0-bin-v0-%s", "c0");
+		ret = cpucc_clk_get_fmax_vdd_class(pdev,
+			(struct clk_init_data *)
+			apcs_mux_c0_clk.clkr.hw.init,
+				prop_name);
+		if (ret) {
+			dev_err(&pdev->dev,
+				"Unable to load safe voltage plan for c0\n");
+			return ret;
+		}
+	}
+	
 	snprintf(prop_name, ARRAY_SIZE(prop_name),
 			"qcom,speed%d-bin-v%d-%s", speed_bin, version, "c1");
 
@@ -901,7 +871,7 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 		}
 	}
 
-		snprintf(prop_name, ARRAY_SIZE(prop_name),
+	snprintf(prop_name, ARRAY_SIZE(prop_name),
 			"qcom,speed%d-bin-v%d-%s", speed_bin, version, "cci");
 
 		ret = cpucc_clk_get_fmax_vdd_class(pdev,
@@ -923,14 +893,37 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 			}
 		}
 
+	pr_err("Grabed speedbins");
+	
+	 /* Rail Regulator for apcs_pll0 */
+	vdd_hf_pll.regulator[0] = devm_regulator_get(&pdev->dev, "vdd_dig_ao");
+	if (IS_ERR(vdd_hf_pll.regulator[0])) {
+		if (!(PTR_ERR(vdd_hf_pll.regulator[0]) == -EPROBE_DEFER))
+			dev_err(&pdev->dev,
+				"Unable to get vdd_dig_ao regulator\n");
+		return PTR_ERR(vdd_hf_pll.regulator[0]);
+	}
+	pr_err("Grabed hfpll1");
+
+	/* Rail Regulator for APCS C1 mux */
+	vdd_cpu_cci.regulator[0] = devm_regulator_get(&pdev->dev, "cpu-vdd");
+	if (IS_ERR(vdd_cpu_cci.regulator[0])) {
+		if (!(PTR_ERR(vdd_cpu_cci.regulator[0]) == -EPROBE_DEFER))
+			dev_err(&pdev->dev,
+				"Unable to get cpu-vdd regulator\n");
+		return PTR_ERR(vdd_cpu_cci.regulator[0]);
+	}
+
+	clk_alpha_pll_configure(&apcs_cpu_pll0, apcs_cpu_pll0.clkr.regmap, &apcs_cpu_pll_config);
+	pr_err("configured alpha pll");
+	
+	
 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
 	if (!data)
 		return -ENOMEM;
-
 		data->num = ARRAY_SIZE(cpu_clks_hws_msm8953);
-		//clk_alpha_pll_configure(&apcs_cpu_pll0, apcs_cpu_pll_8953.clkr.regmap, &apcs_cpu_pll_config);
+			pr_err("Grabed speedbins");
 
-                 
 		for (i = 0; i < ARRAY_SIZE(cpu_clks_hws_msm8953); i++) {
 			ret = devm_clk_hw_register(dev,
 					cpu_clks_hws_msm8953[i]);
@@ -942,13 +935,13 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 			data->hws[i] = cpu_clks_hws_msm8953[i];
 		}
 	
-        
+        	pr_err("registered hws");
 	ret = of_clk_add_hw_provider(dev->of_node, of_clk_hw_onecell_get, data);
 	if (ret) {
 		dev_err(&pdev->dev, "CPU clock driver registration failed\n");
 		return ret;
 	}
-
+	pr_err("added providers");
 	/* For safe freq switching during rate change */
 		apcs_mux_c0_clk.clk_lpm.hw_low_power_ctrl = true;
 		ret = clk_notifier_register(apcs_mux_c0_clk.clkr.hw.clk,
@@ -977,6 +970,7 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 	 * To increase the enable count for the clocks so
 	 * that they dont get disabled during late init.
 	 */
+	 	
 	get_online_cpus();
 	for_each_online_cpu(cpu) {
 		if (cpu/4) {
@@ -989,9 +983,9 @@ static int cpucc_driver_probe(struct platform_device *pdev)
 	put_online_cpus();
 
 		register_pm_notifier(&clock_sdm439_pm_notifier);
-
+	pr_err("about to populate opp table");
 	cpucc_clk_populate_opp_table(pdev);
-	dev_info(dev, "CPU clock Driver probed successfully\n");
+	dev_err(dev, "CPU clock Driver probed successfully\n");
 
 	return ret;
 }
@@ -1056,7 +1050,7 @@ static int __init cpu_clock_init(void)
 			break;
 		udelay(1);
 	}
-
+      pr_err("Early CPU clocks registered");
 	iounmap(base);
 	return 0;
 }
@@ -1065,7 +1059,6 @@ early_initcall(cpu_clock_init);
 static int __init clock_cpu_lpm_get_latency(void)
 {
 	int rc;
-	bool is_sdm439 = false;
 	struct device_node *ofnode = of_find_compatible_node(NULL, NULL,
 					"qcom,cpu-clock-msm8953");
 	
@@ -1083,11 +1076,11 @@ static int __init clock_cpu_lpm_get_latency(void)
 			&apcs_mux_c0_clk.clk_lpm.cpu_latency_no_l2_pc_us);
 		if (rc < 0)
 			pr_err("Failed to get the L2 PC value for pwr\n");
-		pr_debug("Latency for pwr cluster : %d\n",
+		pr_err("Latency for pwr cluster : %d\n",
 			apcs_mux_c0_clk.clk_lpm.cpu_latency_no_l2_pc_us);
 	
 
-	pr_debug("Latency for perf cluster : %d\n",
+	pr_err("Latency for perf cluster : %d\n",
 		apcs_mux_c1_clk.clk_lpm.cpu_latency_no_l2_pc_us);
 
 	return rc;
