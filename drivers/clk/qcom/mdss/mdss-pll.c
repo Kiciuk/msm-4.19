@@ -340,9 +340,6 @@ static int mdss_pll_probe(struct platform_device *pdev)
 			pll_res->index, rc);
 		goto clock_register_error;
 	}
-
-	mdss_pll_util_parse_dt_dfps(pdev, pll_res);
-
 	return rc;
 
 clock_register_error:
