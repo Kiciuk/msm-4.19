@@ -16,7 +16,7 @@
 #include <dt-bindings/spmi/spmi.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/regulator/qcom,rpm-smd-regulator.h>
-#include <dt-bindings/clock/qcom,cpu-sdm.h>
+#include <dt-bindings/clock/qcom,cpu-msm8953.h>
 #include <dt-bindings/clock/qcom,gcc-msm8953.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
 #include <dt-bindings/msm/msm-bus-ids.h>
@@ -31,7 +31,7 @@
 	interrupt-parent = <&wakegic>;
 
 	chosen {
-		bootargs = "core_ctl_disable_cpumask=0-7 kpti=0";
+		bootargs = "sched_enable_hmp=1 kpti=0 core_ctl_disable_cpumask=0-7";
 	};
 
 	firmware: firmware {
@@ -233,6 +233,16 @@
 	ranges = <0 0 0 0xffffffff>;
 	compatible = "simple-bus";
 	
+	apc_apm: apm@b111000 {
+		compatible = "qcom,msm8953-apm";
+		reg = <0xb111000 0x1000>;
+		reg-names = "pm-apcc-glb";
+		qcom,apm-post-halt-delay = <0x2>;
+		qcom,apm-halt-clk-delay = <0x11>;
+		qcom,apm-resume-clk-delay = <0x10>;
+		qcom,apm-sel-switch-delay = <0x01>;
+	};
+
 	intc: interrupt-controller@b000000 {
 		compatible = "qcom,msm-qgic2";
 		interrupt-controller;
@@ -773,33 +783,23 @@
 		#clock-cells = <1>;
 	};
 	
-	apc_apm: apm@b111000 {
-		compatible = "qcom,msm8953-apm";
-		reg = <0xb111000 0x1000>;
-		reg-names = "pm-apcc-glb";
-		qcom,apm-post-halt-delay = <0x2>;
-		qcom,apm-halt-clk-delay = <0x11>;
-		qcom,apm-resume-clk-delay = <0x10>;
-		qcom,apm-sel-switch-delay = <0x01>;
-	};
-	
 	apsscc: qcom,clock-cpu@b111050 {
 		compatible = "qcom,cpu-clock-msm8953";
 		reg =   <0xb011050 0x8>,
 			<0xb011200 0x100>,
 			<0xb1d1050 0x8>,
 			<0xb111050 0x8>,
-			<0xb116000 0x34>,
+			<0xb116000 0x400>,
 			<0xb111200 0x100>,
-			<0x00a412c 0x8>;
+			<0x00a4124 0x8>;
 		reg-names = "apcs-c1-rcg-base", "spm_c1_base",
 			"apcs-cci-rcg-base", "apcs-c0-rcg-base",
 			"apcs_pll0", "spm_c0_base", "efuse";
-		cpu-vdd-supply = <&apc_cpr>; //pm8953_s5?
+		cpu-vdd-supply = <&apc_vreg>;
 		vdd_dig_ao-supply = <&pm8953_s7_level_ao>;
 		vdd_hf_pll-supply = <&apc_cpr>;
 		clocks = <&rpmcc RPM_SMD_XO_A_CLK_SRC>,
-			<&gcc GPLL0_OUT_MAIN>;
+			<&gcc GPLL0_AO_OUT_MAIN>;
 		clock-names = "xo_ao", "gpll0_ao" ;
 		qcom,speed0-bin-v0-c0 =
 			<          0 0>,
@@ -830,6 +830,37 @@
 			<  721920000 5>,
 			<  783360000 6>,
 			<  806400000 7>;
+			
+		qcom,speed2-bin-v0-c0 =
+			<          0 0>,
+			<  652800000 1>,
+			< 1036800000 2>,
+			< 1401600000 3>,
+			< 1689600000 4>,
+			< 1843200000 5>,
+			< 1958400000 6>,
+			< 2016000000 7>;
+			
+		qcom,speed2-bin-v0-c1 =
+			<          0 0>,
+			<  652800000 1>,
+			< 1036800000 2>,
+			< 1401600000 3>,
+			< 1689600000 4>,
+			< 1843200000 5>,
+			< 1958400000 6>,
+			< 2016000000 7>;
+			
+		qcom,speed2-bin-v0-cci =
+			<          0 0>,
+			<  261120000 1>,
+			<  414720000 2>,
+			<  560640000 3>,
+			<  675840000 4>,
+			<  737280000 5>,
+			<  783360000 6>,
+			<  806400000 7>;
+			
 		#clock-cells = <1>;
 	};
 	
@@ -2596,6 +2627,8 @@
 	clock-names = "core_clk", "bus_clk";
 	clocks = <&gcc GCC_MDSS_MDP_CLK>,
 		<&gcc GCC_MDSS_AXI_CLK>;
+	proxy-supply = <&gdsc_mdss>;
+	qcom,proxy-consumer-enable;
 	status = "okay";
 };
 

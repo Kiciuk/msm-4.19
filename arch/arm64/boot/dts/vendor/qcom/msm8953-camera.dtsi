@@ -435,6 +435,8 @@
 			<106 512 0 0>;
 		qcom,msm-bus-vector-dyn-vote;
 		qcom,micro-reset;
+		qcom,src-clock-rates = <100000000 200000000
+			266670000 400000000 465000000>;
 		qcom,cpp-fw-payload-info {
 			qcom,stripe-base = <156>;
 			qcom,plane-base = <141>;

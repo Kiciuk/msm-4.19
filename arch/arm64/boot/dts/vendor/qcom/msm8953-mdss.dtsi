@@ -418,7 +418,7 @@
 		qcom,supply-names = "rot-vdd";
 		qcom,mdss-has-reg-bus;
 		clocks = <&gcc GCC_MDSS_AHB_CLK>,
-			<&gcc MDSS_ROTATOR_VOTE_CLK>;
+			<&gcc_mdss MDSS_ROTATOR_VOTE_CLK>;
 		clock-names = "iface_clk", "rot_core_clk";
 
 		qcom,mdss-rot-reg-bus {

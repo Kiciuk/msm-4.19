@@ -48,6 +48,12 @@
 			clock-names = "bus_clk", "bus_a_clk";
 			clocks = <&rpmcc PNOC_MSMBUS_CLK>,
 				<&rpmcc PNOC_MSMBUS_A_CLK>;
+
+			qcom,node-qos-clks {
+				clock-names = "pcnoc-usb3-axi-no-rate";
+				clocks =
+					<&gcc GCC_PCNOC_USB3_AXI_CLK>;
+			};
 		};
 
 		fab_snoc: fab-snoc {
